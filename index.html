@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
     <meta charset="UTF-8">
@@ -27,24 +28,22 @@
 
         /* =====================================================
            ARGUSSCOPE
-           FRONTEND
+           COMPACT OSINT GEOLOCATION FRONTEND
         ===================================================== */
 
         :root {
             --bg: #070b12;
             --panel: #0c121c;
-            --panel-2: #101824;
+            --panel2: #101824;
 
             --border: #1b2939;
 
             --text: #dce7f0;
-            --muted: #6d8194;
+            --muted: #708496;
 
             --cyan: #20b8ec;
             --green: #10c991;
             --red: #ef5968;
-
-            --header-height: 56px;
         }
 
 
@@ -68,7 +67,6 @@
 
         body {
             background: var(--bg);
-
             color: var(--text);
 
             font-family:
@@ -89,33 +87,29 @@
 
 
         button {
-            -webkit-user-select: none;
             user-select: none;
         }
 
 
         /* =====================================================
-           HEADER
+           TOP BAR
         ===================================================== */
 
         .topbar {
             position: relative;
+            z-index: 3000;
 
-            z-index: 2000;
+            height: 54px;
 
-            height: var(--header-height);
+            margin: 7px;
 
-            margin: 8px;
-
-            padding: 0 10px;
+            padding: 0 9px;
 
             display: flex;
-
             align-items: center;
-
             justify-content: space-between;
 
-            gap: 10px;
+            gap: 8px;
 
             background: var(--panel);
 
@@ -128,11 +122,8 @@
         .brand {
             flex-shrink: 0;
 
-            font-size: 14px;
-
+            font-size: 13px;
             font-weight: bold;
-
-            letter-spacing: .3px;
 
             white-space: nowrap;
         }
@@ -140,41 +131,36 @@
 
         .brand-mark {
             color: var(--cyan);
-
-            margin-right: 6px;
+            margin-right: 5px;
         }
 
 
         .brand-sub {
             color: var(--cyan);
-
-            font-size: 10px;
+            font-size: 9px;
         }
 
 
         /* =====================================================
-           HEADER BUTTONS
+           TOP BUTTONS
         ===================================================== */
 
         .top-actions {
             position: relative;
 
             display: flex;
-
             align-items: center;
-
-            justify-content: flex-end;
 
             gap: 5px;
         }
 
 
         .top-btn {
-            min-height: 34px;
+            min-height: 33px;
 
             padding: 6px 9px;
 
-            background: var(--panel-2);
+            background: var(--panel2);
 
             color: var(--muted);
 
@@ -182,8 +168,7 @@
 
             border-radius: 5px;
 
-            font-size: 9px;
-
+            font-size: 8px;
             font-weight: bold;
 
             cursor: pointer;
@@ -194,18 +179,12 @@
 
         .top-btn:hover {
             color: var(--cyan);
-
             border-color: #28506a;
         }
 
 
-        .top-btn:active {
-            transform: translateY(1px);
-        }
-
-
         .top-btn.active {
-            color: #061018;
+            color: #041017;
 
             background: var(--cyan);
 
@@ -236,16 +215,14 @@
         .map-menu {
             position: absolute;
 
-            top: 40px;
-
+            top: 39px;
             right: 0;
 
-            width: 170px;
+            width: 180px;
 
             padding: 5px;
 
             display: none;
-
             flex-direction: column;
 
             gap: 3px;
@@ -285,7 +262,7 @@
 
             border-radius: 4px;
 
-            font-size: 9px;
+            font-size: 8px;
 
             cursor: pointer;
         }
@@ -306,26 +283,25 @@
 
 
         /* =====================================================
-           MAIN
+           WORKSPACE
         ===================================================== */
 
         .workspace {
             height:
                 calc(
-                    100vh
-                    - var(--header-height)
-                    - 24px
+                    100vh - 69px
                 );
 
-            margin: 0 8px 8px;
+            margin:
+                0 7px 7px;
 
             display: grid;
 
             grid-template-columns:
-                300px
+                295px
                 minmax(0, 1fr);
 
-            gap: 8px;
+            gap: 7px;
 
             min-height: 0;
         }
@@ -337,16 +313,14 @@
 
         .sidebar {
             min-width: 0;
-
             min-height: 0;
 
-            padding: 11px;
+            padding: 10px;
 
             display: flex;
-
             flex-direction: column;
 
-            gap: 11px;
+            gap: 10px;
 
             overflow-y: auto;
 
@@ -362,32 +336,31 @@
 
         .section {
             display: flex;
-
             flex-direction: column;
 
-            gap: 6px;
+            gap: 5px;
         }
 
 
         .section-title {
             color: var(--cyan);
 
-            font-size: 9px;
+            font-size: 8px;
 
             letter-spacing: .8px;
         }
 
 
         /* =====================================================
-           INPUT
+           INPUTS
         ===================================================== */
 
         .input {
             width: 100%;
 
-            height: 39px;
+            height: 38px;
 
-            padding: 0 10px;
+            padding: 0 9px;
 
             background: #080e17;
 
@@ -399,7 +372,7 @@
 
             outline: none;
 
-            font-size: 11px;
+            font-size: 10px;
         }
 
 
@@ -418,15 +391,15 @@
 
 
         /* =====================================================
-           ACTION BUTTON
+           ACTION BUTTONS
         ===================================================== */
 
         .action-button {
             width: 100%;
 
-            min-height: 39px;
+            min-height: 38px;
 
-            padding: 7px 10px;
+            padding: 7px 9px;
 
             border: 0;
 
@@ -436,8 +409,7 @@
 
             background: var(--cyan);
 
-            font-size: 9px;
-
+            font-size: 8px;
             font-weight: bold;
 
             letter-spacing: .4px;
@@ -466,7 +438,7 @@
 
 
         /* =====================================================
-           INTELLIGENCE OUTPUT
+           TERMINAL
         ===================================================== */
 
         .intelligence {
@@ -475,10 +447,9 @@
             flex: 1;
 
             display: flex;
-
             flex-direction: column;
 
-            gap: 6px;
+            gap: 5px;
         }
 
 
@@ -487,7 +458,7 @@
 
             flex: 1;
 
-            padding: 9px;
+            padding: 8px;
 
             overflow: auto;
 
@@ -503,7 +474,7 @@
 
             border-radius: 5px;
 
-            font-size: 9px;
+            font-size: 8px;
 
             line-height: 1.5;
 
@@ -522,14 +493,13 @@
 
 
         /* =====================================================
-           MAP
+           MAP CONTAINER
         ===================================================== */
 
         .map-container {
             position: relative;
 
             min-width: 0;
-
             min-height: 0;
 
             overflow: hidden;
@@ -544,24 +514,7 @@
 
         #map {
             width: 100%;
-
             height: 100%;
-        }
-
-
-        /*
-           Cyber Dark works by applying the filter only to
-           the OSM tile layer.
-
-           Markers, circles and Leaflet controls remain normal.
-        */
-
-        .cyber-dark-tiles {
-            filter:
-                invert(92%)
-                hue-rotate(180deg)
-                brightness(78%)
-                contrast(92%);
         }
 
 
@@ -572,13 +525,13 @@
         .map-status {
             position: absolute;
 
-            left: 9px;
-
-            bottom: 9px;
+            left: 8px;
+            bottom: 8px;
 
             z-index: 1000;
 
-            max-width: calc(100% - 18px);
+            max-width:
+                calc(100% - 16px);
 
             padding: 5px 7px;
 
@@ -590,7 +543,8 @@
 
             pointer-events: none;
 
-            background: rgba(5, 9, 15, .88);
+            background:
+                rgba(5, 9, 15, .88);
 
             color: var(--cyan);
 
@@ -598,7 +552,20 @@
 
             border-radius: 4px;
 
-            font-size: 8px;
+            font-size: 7px;
+        }
+
+
+        /* =====================================================
+           CYBER DARK
+        ===================================================== */
+
+        .cyber-dark-tiles {
+            filter:
+                invert(92%)
+                hue-rotate(180deg)
+                brightness(78%)
+                contrast(92%);
         }
 
 
@@ -612,24 +579,26 @@
 
 
         .leaflet-control-zoom a {
-            width: 34px !important;
+            width: 33px !important;
+            height: 33px !important;
 
-            height: 34px !important;
-
-            line-height: 34px !important;
+            line-height: 33px !important;
 
             color: #d9e6ef !important;
 
-            background: #0b121d !important;
+            background:
+                #0b121d !important;
 
-            border-color: #223244 !important;
+            border-color:
+                #223244 !important;
         }
 
 
         .leaflet-control-zoom a:hover {
             color: var(--cyan) !important;
 
-            background: #101d2c !important;
+            background:
+                #101d2c !important;
         }
 
 
@@ -640,15 +609,14 @@
         .footer {
             position: fixed;
 
-            left: 10px;
-
-            bottom: 3px;
+            left: 9px;
+            bottom: 2px;
 
             z-index: 1500;
 
             color: #3d5368;
 
-            font-size: 7px;
+            font-size: 6px;
 
             pointer-events: none;
         }
@@ -662,18 +630,13 @@
 
             .workspace {
                 grid-template-columns:
-                    260px
+                    255px
                     minmax(0, 1fr);
             }
 
 
             .brand-sub {
                 display: none;
-            }
-
-
-            .top-btn {
-                padding: 6px 7px;
             }
 
         }
@@ -687,7 +650,6 @@
 
             body {
                 overflow-y: auto;
-
                 overflow-x: hidden;
             }
 
@@ -695,7 +657,7 @@
             .topbar {
                 height: auto;
 
-                min-height: 50px;
+                min-height: 49px;
 
                 margin: 6px;
 
@@ -716,30 +678,26 @@
 
             .top-actions {
                 width: 100%;
-
-                display: flex;
-
-                gap: 4px;
             }
 
 
             .top-btn {
                 flex: 1;
 
-                min-height: 32px;
+                min-height: 31px;
 
                 padding: 5px 4px;
 
-                font-size: 8px;
+                font-size: 7px;
             }
 
 
             .map-menu {
-                top: 36px;
+                top: 35px;
 
                 right: 0;
 
-                width: 160px;
+                width: 165px;
             }
 
 
@@ -747,9 +705,7 @@
                 height: auto;
 
                 margin:
-                    0
-                    6px
-                    28px;
+                    0 6px 25px;
 
                 display: flex;
 
@@ -770,11 +726,6 @@
             }
 
 
-            .section {
-                gap: 5px;
-            }
-
-
             .section-title {
                 font-size: 8px;
             }
@@ -783,26 +734,26 @@
             .input {
                 height: 38px;
 
-                font-size: 11px;
+                font-size: 10px;
             }
 
 
             .action-button {
                 min-height: 38px;
 
-                font-size: 9px;
+                font-size: 8px;
             }
 
 
             .intelligence {
-                min-height: 125px;
+                min-height: 120px;
             }
 
 
             .terminal {
-                min-height: 110px;
+                min-height: 105px;
 
-                max-height: 180px;
+                max-height: 175px;
 
                 font-size: 8px;
             }
@@ -811,7 +762,7 @@
             .map-container {
                 width: 100%;
 
-                height: 48vh;
+                height: 50vh;
 
                 min-height: 290px;
             }
@@ -821,20 +772,11 @@
                 min-height: 290px;
             }
 
-
-            .footer {
-                left: 7px;
-
-                bottom: 2px;
-
-                font-size: 6px;
-            }
-
         }
 
 
         /* =====================================================
-           SMALL PHONE
+           SMALL PHONES
         ===================================================== */
 
         @media (max-width: 380px) {
@@ -850,7 +792,7 @@
 
 
             .map-container {
-                height: 45vh;
+                height: 46vh;
 
                 min-height: 270px;
             }
@@ -877,9 +819,9 @@
 
 
             .topbar {
-                height: 48px;
+                height: 46px;
 
-                min-height: 48px;
+                min-height: 46px;
 
                 flex-direction: row;
 
@@ -896,25 +838,22 @@
 
             .top-btn {
                 flex: initial;
-
-                min-height: 30px;
             }
 
 
             .workspace {
                 height:
                     calc(
-                        100vh
-                        - 62px
+                        100vh - 59px
                     );
 
                 display: grid;
 
                 grid-template-columns:
-                    250px
+                    245px
                     minmax(0, 1fr);
 
-                margin-bottom: 5px;
+                margin-bottom: 4px;
             }
 
 
@@ -970,8 +909,6 @@
 
         <div class="top-actions">
 
-            <!-- MAP MENU -->
-
             <button
                 id="mapsButton"
                 class="top-btn"
@@ -980,8 +917,6 @@
                 ◇ MAPS
             </button>
 
-
-            <!-- GPS -->
 
             <button
                 id="gpsButton"
@@ -992,12 +927,23 @@
             </button>
 
 
-            <!-- MAP MENU -->
+            <!-- =================================================
+                 MAP SELECTION
+            ================================================== -->
 
             <div
                 id="mapMenu"
                 class="map-menu"
             >
+
+                <button
+                    class="map-option selected"
+                    data-map="street"
+                    type="button"
+                >
+                    STREET MAP
+                </button>
+
 
                 <button
                     class="map-option"
@@ -1009,7 +955,7 @@
 
 
                 <button
-                    class="map-option selected"
+                    class="map-option"
                     data-map="esri"
                     type="button"
                 >
@@ -1034,7 +980,7 @@
 
 
     <!-- =====================================================
-         WORKSPACE
+         MAIN WORKSPACE
     ====================================================== -->
 
     <main class="workspace">
@@ -1047,7 +993,9 @@
         <aside class="sidebar">
 
 
-            <!-- IP -->
+            <!-- =================================================
+                 IP LOOKUP
+            ================================================== -->
 
             <section class="section">
 
@@ -1079,7 +1027,9 @@
 
 
 
-            <!-- BSSID -->
+            <!-- =================================================
+                 BSSID LOOKUP
+            ================================================== -->
 
             <section class="section">
 
@@ -1111,7 +1061,9 @@
 
 
 
-            <!-- INTELLIGENCE -->
+            <!-- =================================================
+                 INTELLIGENCE OUTPUT
+            ================================================== -->
 
             <section class="intelligence">
 
@@ -1123,11 +1075,9 @@
                 <div
                     id="terminal"
                     class="terminal"
-                >
-ARGUSSCOPE // ONLINE
+                >ARGUSSCOPE // ONLINE
 
-Waiting for target acquisition...
-                </div>
+Waiting for target acquisition...</div>
 
             </section>
 
@@ -1148,7 +1098,7 @@ Waiting for target acquisition...
                 id="mapStatus"
                 class="map-status"
             >
-                MAP // READY
+                MAP // STREET MAP
             </div>
 
         </section>
@@ -1162,7 +1112,7 @@ Waiting for target acquisition...
     ====================================================== -->
 
     <footer class="footer">
-        ARGUSSCOPE // RENDER BACKEND // GITHUB FRONTEND
+        ARGUSSCOPE // RENDER BACKEND // OPENSTREETMAP
     </footer>
 
 
@@ -1181,7 +1131,7 @@ Waiting for target acquisition...
     <script>
 
         /* =====================================================
-           CONFIGURATION
+           CONFIG
         ===================================================== */
 
         const BACKEND_URL =
@@ -1193,31 +1143,57 @@ Waiting for target acquisition...
         ===================================================== */
 
         const ipInput =
-            document.getElementById("ipInput");
+            document.getElementById(
+                "ipInput"
+            );
+
 
         const bssidInput =
-            document.getElementById("bssidInput");
+            document.getElementById(
+                "bssidInput"
+            );
+
 
         const ipButton =
-            document.getElementById("ipButton");
+            document.getElementById(
+                "ipButton"
+            );
+
 
         const bssidButton =
-            document.getElementById("bssidButton");
+            document.getElementById(
+                "bssidButton"
+            );
+
 
         const gpsButton =
-            document.getElementById("gpsButton");
+            document.getElementById(
+                "gpsButton"
+            );
+
 
         const mapsButton =
-            document.getElementById("mapsButton");
+            document.getElementById(
+                "mapsButton"
+            );
+
 
         const mapMenu =
-            document.getElementById("mapMenu");
+            document.getElementById(
+                "mapMenu"
+            );
+
 
         const terminal =
-            document.getElementById("terminal");
+            document.getElementById(
+                "terminal"
+            );
+
 
         const mapStatus =
-            document.getElementById("mapStatus");
+            document.getElementById(
+                "mapStatus"
+            );
 
 
         /* =====================================================
@@ -1244,29 +1220,56 @@ Waiting for target acquisition...
 
 
         /*
-           Default position:
-           Agartala / Tripura area.
+           Default location:
+           Agartala, Tripura.
         */
 
         map.setView(
-            [23.8315, 91.2868],
-            6
+            [
+                23.8315,
+                91.2868
+            ],
+            13
         );
 
 
         /* =====================================================
-           TILE LAYERS
+           STREET MAP
         ===================================================== */
 
         /*
-           Google Satellite
+           OpenStreetMap Standard
 
-           This uses Google's public tile endpoint rather
-           than the Google Maps JavaScript API.
+           This is the detailed street layer.
 
-           If Google changes/restricts this endpoint,
-           the ESRI option remains available.
+           It can display mapped:
+           - roads
+           - street names
+           - places
+           - localities
+           - landmarks
+           - POIs
+           - buildings
+           - other mapped features
+
+           No API key required.
         */
+
+        const streetLayer =
+            L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+                    maxZoom: 19,
+
+                    attribution:
+                        "&copy; OpenStreetMap contributors"
+                }
+            );
+
+
+        /* =====================================================
+           GOOGLE SATELLITE
+        ===================================================== */
 
         const googleLayer =
             L.tileLayer(
@@ -1287,9 +1290,9 @@ Waiting for target acquisition...
             );
 
 
-        /*
-           ESRI Satellite
-        */
+        /* =====================================================
+           ESRI SATELLITE
+        ===================================================== */
 
         const esriLayer =
             L.tileLayer(
@@ -1303,16 +1306,14 @@ Waiting for target acquisition...
             );
 
 
+        /* =====================================================
+           CYBER DARK
+        ===================================================== */
+
         /*
-           Cyber Dark
+           Uses OpenStreetMap tiles and a local visual filter.
 
-           IMPORTANT:
-
-           We intentionally use OpenStreetMap here and
-           apply a CSS filter to the tile layer.
-
-           Therefore this mode does NOT require a
-           separate dark-map API key.
+           No dark-map API key required.
         */
 
         const darkLayer =
@@ -1330,86 +1331,113 @@ Waiting for target acquisition...
             );
 
 
-        /*
-           Start with ESRI.
-        */
+        /* =====================================================
+           DEFAULT MAP
+        ===================================================== */
 
-        esriLayer.addTo(map);
+        streetLayer.addTo(
+            map
+        );
 
 
         let currentLayer =
-            "esri";
+            "street";
 
 
         /* =====================================================
-           MAP LAYER FUNCTIONS
+           LAYER HELPERS
         ===================================================== */
 
-        function getLayer(name) {
+        function getLayer(
+            name
+        ) {
 
-            if (name === "google") {
-                return googleLayer;
+            switch (name) {
+
+                case "google":
+                    return googleLayer;
+
+                case "esri":
+                    return esriLayer;
+
+                case "dark":
+                    return darkLayer;
+
+                case "street":
+                default:
+                    return streetLayer;
             }
-
-            if (name === "dark") {
-                return darkLayer;
-            }
-
-            return esriLayer;
         }
 
 
-        function getLayerName(name) {
+        function getLayerName(
+            name
+        ) {
 
-            if (name === "google") {
-                return "GOOGLE SATELLITE";
+            switch (name) {
+
+                case "google":
+                    return "GOOGLE SATELLITE";
+
+                case "esri":
+                    return "ESRI SATELLITE";
+
+                case "dark":
+                    return "CYBER DARK";
+
+                case "street":
+                default:
+                    return "STREET MAP";
             }
-
-            if (name === "dark") {
-                return "CYBER DARK";
-            }
-
-            return "ESRI SATELLITE";
         }
 
 
-        function changeMap(name) {
+        /* =====================================================
+           CHANGE MAP
+        ===================================================== */
 
-            const newLayer =
+        function changeMap(
+            name
+        ) {
+
+            const selectedLayer =
                 getLayer(name);
 
 
-            if (map.hasLayer(
-                googleLayer
-            )) {
+            /*
+               Remove every known layer first.
+            */
 
-                map.removeLayer(
-                    googleLayer
-                );
-            }
-
-
-            if (map.hasLayer(
-                esriLayer
-            )) {
-
-                map.removeLayer(
-                    esriLayer
-                );
-            }
-
-
-            if (map.hasLayer(
+            [
+                streetLayer,
+                googleLayer,
+                esriLayer,
                 darkLayer
-            )) {
+            ].forEach(
+                layer => {
 
-                map.removeLayer(
-                    darkLayer
-                );
-            }
+                    if (
+                        map.hasLayer(
+                            layer
+                        )
+                    ) {
+
+                        map.removeLayer(
+                            layer
+                        );
+                    }
+
+                }
+            );
 
 
-            newLayer.addTo(map);
+            /*
+               Add selected layer.
+            */
+
+            selectedLayer.addTo(
+                map
+            );
 
 
             currentLayer =
@@ -1417,11 +1445,13 @@ Waiting for target acquisition...
 
 
             /*
-               Update menu selection.
+               Update selection.
             */
 
             document
-                .querySelectorAll(".map-option")
+                .querySelectorAll(
+                    ".map-option"
+                )
                 .forEach(
                     button => {
 
@@ -1436,7 +1466,9 @@ Waiting for target acquisition...
 
             mapStatus.textContent =
                 "MAP // " +
-                getLayerName(name);
+                getLayerName(
+                    name
+                );
 
 
             /*
@@ -1454,12 +1486,15 @@ Waiting for target acquisition...
 
 
             /*
-               Important after changing tile layers.
+               Fix Leaflet size after
+               changing the map.
             */
 
             setTimeout(
                 () => {
+
                     map.invalidateSize();
+
                 },
                 150
             );
@@ -1507,10 +1542,6 @@ Waiting for target acquisition...
         );
 
 
-        /*
-           Close map menu when tapping elsewhere.
-        */
-
         document.addEventListener(
             "click",
             event => {
@@ -1533,11 +1564,12 @@ Waiting for target acquisition...
 
 
         /* =====================================================
-           MAP RESULT
+           TARGET MARKER
         ===================================================== */
 
         let targetMarker =
             null;
+
 
         let targetCircle =
             null;
@@ -1568,26 +1600,42 @@ Waiting for target acquisition...
         }
 
 
+        /* =====================================================
+           SHOW TARGET
+        ===================================================== */
+
         function showTarget(
             latitude,
             longitude,
             radius,
-            popupTitle
+            title
         ) {
 
             const lat =
-                Number(latitude);
+                Number(
+                    latitude
+                );
+
 
             const lon =
-                Number(longitude);
+                Number(
+                    longitude
+                );
 
-            const radiusNumber =
-                Number(radius);
+
+            const radiusValue =
+                Number(
+                    radius
+                );
 
 
             if (
-                !Number.isFinite(lat) ||
-                !Number.isFinite(lon)
+                !Number.isFinite(
+                    lat
+                ) ||
+                !Number.isFinite(
+                    lon
+                )
             ) {
 
                 throw new Error(
@@ -1601,47 +1649,55 @@ Waiting for target acquisition...
 
             targetMarker =
                 L.marker(
-                    [lat, lon]
+                    [
+                        lat,
+                        lon
+                    ]
                 )
-                .addTo(map);
+                .addTo(
+                    map
+                );
 
 
             targetMarker.bindPopup(
                 `
-                <strong>
-                    ${escapeHtml(popupTitle)}
-                </strong>
+                    <strong>
+                        ${escapeHtml(title)}
+                    </strong>
 
-                <br>
+                    <br>
 
-                Latitude:
-                ${lat.toFixed(6)}
+                    Latitude:
+                    ${lat.toFixed(6)}
 
-                <br>
+                    <br>
 
-                Longitude:
-                ${lon.toFixed(6)}
+                    Longitude:
+                    ${lon.toFixed(6)}
                 `
             );
 
 
             /*
-               Draw accuracy radius if supplied.
+               Accuracy radius.
             */
 
             if (
                 Number.isFinite(
-                    radiusNumber
+                    radiusValue
                 ) &&
-                radiusNumber > 0
+                radiusValue > 0
             ) {
 
                 targetCircle =
                     L.circle(
-                        [lat, lon],
+                        [
+                            lat,
+                            lon
+                        ],
                         {
                             radius:
-                                radiusNumber,
+                                radiusValue,
 
                             color:
                                 "#20b8ec",
@@ -1650,30 +1706,40 @@ Waiting for target acquisition...
                                 "#20b8ec",
 
                             fillOpacity:
-                                0.10,
+                                .10,
 
                             weight:
                                 1.5
                         }
                     )
-                    .addTo(map);
+                    .addTo(
+                        map
+                    );
             }
 
 
             /*
-               Fit map to result.
+               Move to target.
 
-               We don't continuously force the map's zoom,
-               so normal user zooming continues to work.
+               This happens only once after
+               receiving a result.
+
+               It does NOT continuously reset
+               the user's zoom.
             */
 
-            if (targetCircle) {
+            if (
+                targetCircle
+            ) {
 
                 map.fitBounds(
                     targetCircle.getBounds(),
                     {
                         padding:
-                            [30, 30],
+                            [
+                                35,
+                                35
+                            ],
 
                         maxZoom:
                             16
@@ -1683,7 +1749,10 @@ Waiting for target acquisition...
             } else {
 
                 map.setView(
-                    [lat, lon],
+                    [
+                        lat,
+                        lon
+                    ],
                     14
                 );
             }
@@ -1698,7 +1767,9 @@ Waiting for target acquisition...
 
             setTimeout(
                 () => {
+
                     map.invalidateSize();
+
                 },
                 200
             );
@@ -1706,32 +1777,36 @@ Waiting for target acquisition...
 
 
         /* =====================================================
-           HTML ESCAPE
+           ESCAPE HTML
         ===================================================== */
 
-        function escapeHtml(value) {
+        function escapeHtml(
+            value
+        ) {
 
-            return String(value)
-                .replace(
-                    /&/g,
-                    "&amp;"
-                )
-                .replace(
-                    /</g,
-                    "&lt;"
-                )
-                .replace(
-                    />/g,
-                    "&gt;"
-                )
-                .replace(
-                    /"/g,
-                    "&quot;"
-                )
-                .replace(
-                    /'/g,
-                    "&#039;"
-                );
+            return String(
+                value
+            )
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+            .replace(
+                /</g,
+                "&lt;"
+            )
+            .replace(
+                />/g,
+                "&gt;"
+            )
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+            .replace(
+                /'/g,
+                "&#039;"
+            );
         }
 
 
@@ -1748,7 +1823,10 @@ Waiting for target acquisition...
                 "terminal";
 
 
-            if (type === "success") {
+            if (
+                type ===
+                "success"
+            ) {
 
                 terminal.classList.add(
                     "success"
@@ -1756,7 +1834,10 @@ Waiting for target acquisition...
             }
 
 
-            if (type === "error") {
+            if (
+                type ===
+                "error"
+            ) {
 
                 terminal.classList.add(
                     "error"
@@ -1776,10 +1857,12 @@ Waiting for target acquisition...
         function setLoading(
             button,
             loading,
-            loadingText
+            text
         ) {
 
-            if (loading) {
+            if (
+                loading
+            ) {
 
                 if (
                     !button.dataset.originalText
@@ -1793,13 +1876,15 @@ Waiting for target acquisition...
                 button.disabled =
                     true;
 
+
                 button.textContent =
-                    loadingText;
+                    text;
 
             } else {
 
                 button.disabled =
                     false;
+
 
                 button.textContent =
                     button.dataset.originalText ||
@@ -1820,7 +1905,9 @@ Waiting for target acquisition...
                 await response.text();
 
 
-            if (!text) {
+            if (
+                !text
+            ) {
 
                 throw new Error(
                     "Backend returned an empty response."
@@ -1854,7 +1941,9 @@ Waiting for target acquisition...
                 ipInput.value.trim();
 
 
-            if (!ip) {
+            if (
+                !ip
+            ) {
 
                 setTerminal(
                     "ERROR\n\nEnter an IP address.",
@@ -1892,7 +1981,9 @@ Waiting for target acquisition...
                 const url =
                     BACKEND_URL +
                     "/api/v1/locate-ip?ip=" +
-                    encodeURIComponent(ip);
+                    encodeURIComponent(
+                        ip
+                    );
 
 
                 const response =
@@ -1921,9 +2012,12 @@ Waiting for target acquisition...
 
 
                 if (
-                    data.success === true &&
-                    data.latitude !== null &&
-                    data.longitude !== null
+                    data.success ===
+                        true &&
+                    data.latitude !=
+                        null &&
+                    data.longitude !=
+                        null
                 ) {
 
                     setTerminal(
@@ -1963,7 +2057,9 @@ Waiting for target acquisition...
                         "MAP // NO RESULT";
                 }
 
-            } catch (error) {
+            } catch (
+                error
+            ) {
 
                 setTerminal(
                     "IP LOOKUP ERROR\n\n" +
@@ -1986,7 +2082,7 @@ Waiting for target acquisition...
 
 
         /* =====================================================
-           BSSID VALIDATION
+           BSSID NORMALIZATION
         ===================================================== */
 
         function normalizeBssid(
@@ -2016,10 +2112,10 @@ Waiting for target acquisition...
                     .trim();
 
 
-            return (
-                /^[0-9a-fA-F]{12}$/
-                .test(clean)
-            );
+            return /^[0-9a-fA-F]{12}$/
+                .test(
+                    clean
+                );
         }
 
 
@@ -2033,7 +2129,9 @@ Waiting for target acquisition...
                 bssidInput.value.trim();
 
 
-            if (!raw) {
+            if (
+                !raw
+            ) {
 
                 setTerminal(
                     "ERROR\n\nEnter a BSSID.",
@@ -2046,24 +2144,15 @@ Waiting for target acquisition...
             }
 
 
-            /*
-               Allow:
-
-               AA:BB:CC:DD:EE:FF
-
-               or multiple:
-
-               AA:BB:CC:DD:EE:FF,
-               11:22:33:44:55:66
-            */
-
             const bssids =
                 raw
                     .split(",")
                     .map(
                         normalizeBssid
                     )
-                    .filter(Boolean);
+                    .filter(
+                        Boolean
+                    );
 
 
             for (
@@ -2109,7 +2198,8 @@ Waiting for target acquisition...
                 */
 
                 if (
-                    bssids.length === 1
+                    bssids.length ===
+                    1
                 ) {
 
                     setTerminal(
@@ -2155,9 +2245,12 @@ Waiting for target acquisition...
 
 
                     if (
-                        data.success === true &&
-                        data.latitude !== null &&
-                        data.longitude !== null
+                        data.success ===
+                            true &&
+                        data.latitude !=
+                            null &&
+                        data.longitude !=
+                            null
                     ) {
 
                         setTerminal(
@@ -2217,17 +2310,13 @@ Waiting for target acquisition...
 
                 const scans =
                     bssids.map(
-                        bssid => {
+                        bssid => ({
+                            netid:
+                                bssid,
 
-                            return {
-                                netid:
-                                    bssid,
-
-                                rssi:
-                                    -65
-                            };
-
-                        }
+                            rssi:
+                                -65
+                        })
                     );
 
 
@@ -2266,9 +2355,12 @@ Waiting for target acquisition...
 
 
                 if (
-                    data.success === true &&
-                    data.latitude !== null &&
-                    data.longitude !== null
+                    data.success ===
+                        true &&
+                    data.latitude !=
+                        null &&
+                    data.longitude !=
+                        null
                 ) {
 
                     setTerminal(
@@ -2304,7 +2396,9 @@ Waiting for target acquisition...
                         "MAP // NO RESULT";
                 }
 
-            } catch (error) {
+            } catch (
+                error
+            ) {
 
                 setTerminal(
                     "BSSID LOOKUP ERROR\n\n" +
@@ -2368,15 +2462,16 @@ Waiting for target acquisition...
                     const latitude =
                         position.coords.latitude;
 
+
                     const longitude =
                         position.coords.longitude;
+
 
                     const accuracy =
                         position.coords.accuracy;
 
 
                     setTerminal(
-
                         [
                             "DEVICE GPS // LOCK ACQUIRED",
 
@@ -2394,8 +2489,9 @@ Waiting for target acquisition...
                             ) +
                             " m"
 
-                        ].join("\n"),
-
+                        ].join(
+                            "\n"
+                        ),
                         "success"
                     );
 
@@ -2512,7 +2608,8 @@ Waiting for target acquisition...
             event => {
 
                 if (
-                    event.key === "Enter"
+                    event.key ===
+                    "Enter"
                 ) {
 
                     event.preventDefault();
@@ -2528,7 +2625,8 @@ Waiting for target acquisition...
             event => {
 
                 if (
-                    event.key === "Enter"
+                    event.key ===
+                    "Enter"
                 ) {
 
                     event.preventDefault();
@@ -2549,7 +2647,9 @@ Waiting for target acquisition...
 
                 setTimeout(
                     () => {
+
                         map.invalidateSize();
+
                     },
                     100
                 );
@@ -2563,7 +2663,9 @@ Waiting for target acquisition...
 
                 setTimeout(
                     () => {
+
                         map.invalidateSize();
+
                     },
                     350
                 );
@@ -2587,4 +2689,5 @@ Waiting for target acquisition...
     </script>
 
 </body>
+
 </html>
