@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ARGUSSCOPE // Advanced Recon Engine</title>
+  <title>ARGUSSCOPE // WiGLE Recon Engine</title>
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -87,7 +87,6 @@
       padding: 6px 12px;
       border-radius: 4px;
       cursor: pointer;
-      transition: all 0.2s ease;
     }
 
     .map-btn.active {
@@ -123,7 +122,7 @@
       padding: 18px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
       overflow-y: auto;
     }
 
@@ -135,10 +134,9 @@
       letter-spacing: 1.5px;
     }
 
-    .input-group { display: flex; gap: 8px; }
+    .input-group { display: flex; gap: 8px; flex-direction: column; }
 
     input[type="text"] {
-      flex: 1;
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 4px;
@@ -191,21 +189,6 @@
     }
 
     #map { width: 100%; height: 100%; background: #000; }
-
-    /* Map mode CSS filters */
-    .mode-dark .leaflet-tile { filter: brightness(0.7) invert(1) contrast(1.2) hue-rotate(200deg) saturate(0.3); }
-    .mode-satellite .leaflet-tile { filter: brightness(1.05) contrast(1.1); }
-    .mode-googleSat .leaflet-tile { filter: none !important; }
-    .mode-topo .leaflet-tile { filter: contrast(1.1) brightness(0.95); }
-
-    .leaflet-container { background: #060913 !important; }
-    .leaflet-popup-content-wrapper {
-      background: var(--bg-panel) !important;
-      color: var(--text-main) !important;
-      border: 1px solid var(--border-color);
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-    }
   </style>
 </head>
 <body class="mode-googleSat">
@@ -213,7 +196,7 @@
   <header>
     <div class="brand">
       <div class="brand-logo"></div>
-      <h1>ARGUS<span>SCOPE</span> // GEOSPATIAL ENGINE</h1>
+      <h1>ARGUS<span>SCOPE</span> // WiGLE ENGINE</h1>
     </div>
 
     <div class="header-actions">
@@ -223,22 +206,27 @@
         <button class="map-btn active" id="btnGoogleSat" onclick="switchMapMode('googleSat')">GOOGLE HD</button>
         <button class="map-btn" id="btnSat" onclick="switchMapMode('satellite')">ESRI SATELLITE</button>
         <button class="map-btn" id="btnDark" onclick="switchMapMode('dark')">CYBER DARK</button>
-        <button class="map-btn" id="btnTopo" onclick="switchMapMode('topo')">TOPO RELIEF</button>
       </div>
     </div>
   </header>
 
   <div class="dashboard">
     <div class="sidebar">
-      <div class="section-title">// 01. Target Coordinates / IP</div>
+      <div class="section-title">// 01. Standard IP Lookup</div>
       <div class="input-group">
-        <input type="text" id="ipInput" placeholder="Enter IP or Domain (e.g., 184.84.167.84)">
-        <button class="btn-action" onclick="lookupIP()">EXECUTE</button>
+        <input type="text" id="ipInput" placeholder="Enter Target IP (e.g., 184.84.167.84)">
+        <button class="btn-action" onclick="lookupIP()">EXECUTE IP SEARCH</button>
       </div>
 
-      <div class="section-title">// 02. Geospatial Telemetry</div>
+      <div class="section-title">// 02. WiGLE BSSID Triangulation</div>
+      <div class="input-group">
+        <input type="text" id="bssidInput" placeholder="MAC Address (e.g., 00:14:6C:7E:40:80)">
+        <button class="btn-action" style="background:var(--accent-green);" onclick="lookupWigleBssid()">TRIANGULATE BSSID</button>
+      </div>
+
+      <div class="section-title">// 03. Telemetry Terminal</div>
       <div class="intel-terminal" id="intelTerminal">
-        High-Zoom GIS Engine initialized. Max zoom level unlocked (Level 20).
+        WiGLE Global Recon Engine ready. Enter an IP or Wi-Fi MAC Address to begin.
       </div>
     </div>
 
@@ -249,39 +237,15 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- JAVASCRIPT (SCRIPT TAG) -->
   <script>
     const API_URL = "https://argusscope-backend.onrender.com";
 
-    // Unlocked High-Zoom Map Tile Configuration
     const layers = {
-      // Google Satellite (Zoom level 20 - Deepest Street/Building zoom)
-      googleSat: L.tileLayer('https://mt1.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
-        maxZoom: 20,
-        maxNativeZoom: 20,
-        attribution: 'Google Hybrid HD'
-      }),
-      // ESRI Satellite (Zoom level 19)
-      satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        maxZoom: 20,
-        maxNativeZoom: 19,
-        attribution: 'Esri World Imagery'
-      }),
-      // Cyber Dark (Zoom level 19)
-      dark: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 20,
-        maxNativeZoom: 19,
-        attribution: 'OpenStreetMap Inverted'
-      }),
-      // Topographic Relief (Zoom level 17 native, auto-scaled to 20)
-      topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-        maxZoom: 20,
-        maxNativeZoom: 17,
-        attribution: 'OpenTopoMap'
-      })
+      googleSat: L.tileLayer('https://mt1.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 20, maxNativeZoom: 20 }),
+      satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 20, maxNativeZoom: 19 }),
+      dark: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 20, maxNativeZoom: 19 })
     };
 
-    // Default to Google Satellite HD
     const map = L.map('map', { zoomControl: false, layers: [layers.googleSat] }).setView([20, 0], 3);
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
@@ -294,21 +258,18 @@
       map.removeLayer(layers[activeLayerKey]);
       map.addLayer(layers[key]);
       activeLayerKey = key;
-      document.body.className = `mode-${key}`;
 
       document.querySelectorAll('.map-btn').forEach(btn => btn.classList.remove('active'));
       if (key === 'googleSat') document.getElementById('btnGoogleSat').classList.add('active');
       if (key === 'satellite') document.getElementById('btnSat').classList.add('active');
       if (key === 'dark') document.getElementById('btnDark').classList.add('active');
-      if (key === 'topo') document.getElementById('btnTopo').classList.add('active');
     }
 
     function plotCoordinates(lat, lng, label, radiusMeters = 0) {
       if (activeMarker) map.removeLayer(activeMarker);
       if (activeRadiusCircle) map.removeLayer(activeRadiusCircle);
 
-      // Zoom level 16 for tight street/building focus on execution
-      map.flyTo([lat, lng], 16, { duration: 1.5 });
+      map.flyTo([lat, lng], 17, { duration: 1.5 });
 
       if (radiusMeters > 0) {
         activeRadiusCircle = L.circle([lat, lng], {
@@ -324,60 +285,67 @@
         .openPopup();
     }
 
-    function locateDeviceGPS() {
-      const log = document.getElementById('intelTerminal');
-      log.innerHTML = `Acquiring Hardware Geolocation...`;
-
-      if (!navigator.geolocation) {
-        log.innerHTML = `<span style="color:var(--accent-red)">GEOLOCATION UNSUPPORTED.</span>`;
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          const acc = pos.coords.accuracy;
-          plotCoordinates(lat, lng, "Device GPS Position", acc);
-          log.innerHTML = `
-            <div class="intel-row"><span class="intel-key">SOURCE</span><span class="intel-val" style="color:var(--accent-green)">HARDWARE GPS</span></div>
-            <div class="intel-row"><span class="intel-key">LATITUDE</span><span class="intel-val">${lat.toFixed(5)}</span></div>
-            <div class="intel-row"><span class="intel-key">LONGITUDE</span><span class="intel-val">${lng.toFixed(5)}</span></div>
-            <div class="intel-row"><span class="intel-key">ACCURACY</span><span class="intel-val">~${Math.round(acc)} meters</span></div>
-          `;
-        },
-        (err) => {
-          log.innerHTML = `<span style="color:var(--accent-red)">LOCATION PERMISSION DENIED.</span>`;
-        },
-        { enableHighAccuracy: true }
-      );
-    }
-
     async function lookupIP() {
       const ip = document.getElementById('ipInput').value.trim();
       if (!ip) return;
 
       const log = document.getElementById('intelTerminal');
-      log.innerHTML = `Querying GIS Coordinates for target: <br><span style="color:var(--accent-cyan);">${ip}</span>...`;
+      log.innerHTML = `Querying IP Target: ${ip}...`;
 
       try {
-        const res = await fetch(`${API_URL}/api/v1/locate-ip?ip=${encodeURIComponent(ip)}&_t=${Date.now()}`);
+        const res = await fetch(`${API_URL}/api/v1/locate-ip?ip=${encodeURIComponent(ip)}`);
         const data = await res.json();
 
         if (data.latitude && data.longitude) {
-          plotCoordinates(data.latitude, data.longitude, `Target: ${data.ip}`, data.accuracy_radius_m || 8000);
+          plotCoordinates(data.latitude, data.longitude, `IP Target: ${data.ip}`, data.accuracy_radius_m);
           log.innerHTML = `
             <div class="intel-row"><span class="intel-key">TARGET</span><span class="intel-val">${data.ip}</span></div>
-            <div class="intel-row"><span class="intel-key">CITY / REGION</span><span class="intel-val">${data.city || 'Unknown'}, ${data.country || 'Unknown'}</span></div>
+            <div class="intel-row"><span class="intel-key">CONFIDENCE</span><span class="intel-val">${data.confidence}</span></div>
+            <div class="intel-row"><span class="intel-key">LOCATION</span><span class="intel-val">${data.city}, ${data.country}</span></div>
             <div class="intel-row"><span class="intel-key">COORDINATES</span><span class="intel-val">${data.latitude}, ${data.longitude}</span></div>
-            <div class="intel-row"><span class="intel-key">NETWORK / ISP</span><span class="intel-val">${data.org || 'Unknown'}</span></div>
           `;
         } else {
-          log.innerHTML = `<span style="color:var(--accent-red)">UNABLE TO RESOLVE TARGET.</span>`;
+          log.innerHTML = `<span style="color:var(--accent-red)">TARGET RESOLUTION FAILED.</span>`;
         }
       } catch (err) {
-        log.innerHTML = `<span style="color:var(--accent-red)">API CONNECTION ERROR.</span>`;
+        log.innerHTML = `<span style="color:var(--accent-red)">ERROR CONNECTING TO BACKEND.</span>`;
       }
+    }
+
+    async function lookupWigleBssid() {
+      const bssid = document.getElementById('bssidInput').value.trim();
+      if (!bssid) return;
+
+      const log = document.getElementById('intelTerminal');
+      log.innerHTML = `Querying WiGLE Registry for BSSID: <br><span style="color:var(--accent-cyan);">${bssid}</span>...`;
+
+      try {
+        const res = await fetch(`${API_URL}/api/v1/locate-bssid?netid=${encodeURIComponent(bssid)}`);
+        const data = await res.json();
+
+        if (data.latitude && data.longitude) {
+          plotCoordinates(data.latitude, data.longitude, `Wi-Fi: ${data.ssid}`, data.accuracy_radius_m || 25);
+          log.innerHTML = `
+            <div class="intel-row"><span class="intel-key">SOURCE</span><span class="intel-val" style="color:var(--accent-green)">WiGLE REGISTRY</span></div>
+            <div class="intel-row"><span class="intel-key">SSID</span><span class="intel-val">${data.ssid}</span></div>
+            <div class="intel-row"><span class="intel-key">BSSID</span><span class="intel-val">${data.bssid}</span></div>
+            <div class="intel-row"><span class="intel-key">CONFIDENCE</span><span class="intel-val">${data.confidence}</span></div>
+            <div class="intel-row"><span class="intel-key">COORDINATES</span><span class="intel-val">${data.latitude}, ${data.longitude}</span></div>
+            <div class="intel-row"><span class="intel-key">ACCURACY</span><span class="intel-val">~${data.accuracy_radius_m} meters</span></div>
+          `;
+        } else {
+          log.innerHTML = `<span style="color:var(--accent-red)">${data.error || 'BSSID NOT FOUND IN WIGLE DATABASE.'}</span>`;
+        }
+      } catch (err) {
+        log.innerHTML = `<span style="color:var(--accent-red)">API ERROR. CHECK BACKEND CREDENTIALS.</span>`;
+      }
+    }
+
+    function locateDeviceGPS() {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition((pos) => {
+        plotCoordinates(pos.coords.latitude, pos.coords.longitude, "Device GPS", pos.coords.accuracy);
+      }, null, { enableHighAccuracy: true });
     }
   </script>
 </body>
