@@ -888,7 +888,7 @@ The actual repository structure can differ.
 Current backend version:
 
 ```text
-2.2.0
+3.1.0
 ```
 
 ---
