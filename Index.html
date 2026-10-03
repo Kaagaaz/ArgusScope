@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArgusScope - Geo-OSINT Recon</title>
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 20px; }
+    
+    header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid #1e293b; margin-bottom: 20px; }
+    header h1 { font-size: 1.5rem; letter-spacing: 1px; color: #38bdf8; }
+    .status-badge { background: #064e3b; color: #34d399; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; border: 1px solid #059669; }
+    
+    .dashboard { display: grid; grid-template-columns: 340px 1fr; gap: 20px; height: calc(100vh - 100px); }
+    
+    .panel { background: #1e293b; border-radius: 8px; border: 1px solid #334155; padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+    .panel h3 { font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+    
+    /* Input Modules */
+    .drop-zone { border: 2px dashed #475569; border-radius: 6px; padding: 24px; text-align: center; cursor: pointer; transition: background 0.2s, border-color 0.2s; }
+    .drop-zone:hover { border-color: #38bdf8; background: #0f172a; }
+    input[type="file"] { display: none; }
+    
+    .input-group { display: flex; gap: 8px; }
+    input[type="text"] { flex: 1; background: #0f172a; border: 1px solid #334155; border-radius: 4px; padding: 10px 12px; color: #fff; font-size: 0.9rem; }
+    input[type="text"]:focus { outline: none; border-color: #38bdf8; }
+    button { background: #0284c7; color: white; border: none; padding: 10px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+    button:hover { background: #0369a1; }
+    
+    /* Map & Results */
+    #map { width: 100%; height: 100%; border-radius: 8px; border: 1px solid #334155; }
+    .summary-box { background: #0f172a; border-radius: 6px; padding: 14px; font-size: 0.88rem; line-height: 1.6; border: 1px solid #334155; color: #cbd5e1; }
+    .summary-box b { color: #f8fafc; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>ARGUSSCOPE</h1>
+    <span class="status-badge" id="statusBadge">● FRONTEND READY</span>
+  </header>
+
+  <div class="dashboard">
+    <!-- Sidebar Control Panel -->
+    <div class="panel">
+      
+      <!-- Module 1: EXIF Upload -->
+      <h3>1. Image Analysis (EXIF)</h3>
+      <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
+        <p id="fileLabel">Click or Drag Image Here</p>
+        <input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload(this.files[0])">
+      </div>
+
+      <!-- Module 2: IP Lookup -->
+      <h3>2. Network Locate (IP)</h3>
+      <div class="input-group">
+        <input type="text" id="ipInput" placeholder="e.g. 8.8.8.8">
+        <button onclick="lookupIP()">Map IP</button>
+      </div>
+
+      <!-- Output Summary Panel -->
+      <h3>Target Intelligence Summary</h3>
+      <div class="summary-box" id="summary">
+        Upload an image or enter an IP address to inspect target coordinates...
+      </div>
+      
+    </div>
+
+    <!-- Map Canvas -->
+    <div id="map"></div>
+  </div>
+
+  <!-- Leaflet Maps Library -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <script>
+    // Leave this empty for now — we will paste your live Cloudflare API domain here later!
+    const API_URL = "YOUR_BACKEND_URL_HERE"; 
+
+    // Initialize Map with Esri Satellite Imagery
+    const map = L.map('map').setView([20, 0], 2);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri'
+    }).addTo(map);
+
+    let activeMarker = null;
+
+    // Helper: Plot Pin on Map & Update Dashboard
+    function renderTarget(lat, lng, label, details) {
+      if (activeMarker) map.removeLayer(activeMarker);
+      
+      map.flyTo([lat, lng], 13);
+      activeMarker = L.marker([lat, lng]).addTo(map)
+        .bindPopup(`<b>${label}</b><br>${lat.toFixed(4)}, ${lng.toFixed(4)}`)
+        .openPopup();
+
+      document.getElementById('summary').innerHTML = details;
+    }
+
+    // Function 1: Image EXIF Handler
+    async function handleFileUpload(file) {
+      if (!file) return;
+      document.getElementById('fileLabel').innerText = file.name;
+      document.getElementById('summary').innerHTML = "<i>Analyzing image metadata...</i>";
+
+      if (API_URL === "YOUR_BACKEND_URL_HERE") {
+        document.getElementById('summary').innerText = "Frontend active! Connect a backend URL to test live extraction.";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const res = await fetch(`${API_URL}/api/v1/extract-exif`, { method: "POST", body: formData });
+        const data = await res.json();
+
+        if (data.latitude && data.longitude) {
+          renderTarget(
+            data.latitude, 
+            data.longitude, 
+            file.name, 
+            `<b>File:</b> ${file.name}<br><b>Latitude:</b> ${data.latitude.toFixed(5)}<br><b>Longitude:</b> ${data.longitude.toFixed(5)}`
+          );
+        } else {
+          document.getElementById('summary').innerText = "No GPS metadata found in image EXIF.";
+        }
+      } catch (err) {
+        document.getElementById('summary').innerText = "Error connecting to backend API.";
+      }
+    }
+
+    // Function 2: IP Geolocation Handler
+    async function lookupIP() {
+      const ip = document.getElementById('ipInput').value.trim();
+      if (!ip) return;
+      document.getElementById('summary').innerHTML = "<i>Locating IP network...</i>";
+
+      if (API_URL === "YOUR_BACKEND_URL_HERE") {
+        document.getElementById('summary').innerText = "Frontend active! Connect a backend URL to test live IP lookups.";
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/api/v1/locate-ip?ip=${ip}`);
+        const data = await res.json();
+
+        if (data.latitude && data.longitude) {
+          renderTarget(
+            data.latitude, 
+            data.longitude, 
+            `IP: ${ip}`, 
+            `<b>Target IP:</b> ${ip}<br><b>Location:</b> ${data.city}, ${data.country}<br><b>ISP:</b> ${data.org}`
+          );
+        } else {
+          document.getElementById('summary').innerText = "Unable to resolve coordinates for this IP.";
+        }
+      } catch (err) {
+        document.getElementById('summary').innerText = "Error connecting to backend API.";
+      }
+    }
+  </script>
+</body>
+</html>
