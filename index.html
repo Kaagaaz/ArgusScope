@@ -25,7 +25,8 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   box-sizing:border-box;
 }
 
-html,body{
+html,
+body{
   margin:0;
   width:100%;
   height:100%;
@@ -35,23 +36,32 @@ html,body{
   font-family:"JetBrains Mono",Consolas,monospace;
 }
 
-button,input{
+button,
+input{
   font:inherit;
 }
 
 .app{
+  width:100%;
   height:100vh;
+
   padding:9px;
+
   display:grid;
   grid-template-rows:46px 1fr 23px;
   gap:7px;
 }
 
-/* HEADER */
+/* =========================
+   HEADER
+========================= */
 
 header{
+  min-width:0;
+
   border:1px solid var(--line);
   border-radius:6px;
+
   background:var(--panel);
 
   display:flex;
@@ -62,20 +72,28 @@ header{
 }
 
 .logo{
+  min-width:0;
+
   display:flex;
   align-items:center;
   gap:7px;
 
   font-size:13px;
   font-weight:bold;
+
   white-space:nowrap;
 }
 
 .logo-dot{
+  flex:none;
+
   width:10px;
   height:10px;
+
   background:var(--cyan);
+
   border-radius:2px;
+
   box-shadow:0 0 12px #27baf288;
 }
 
@@ -83,25 +101,34 @@ header{
   color:var(--cyan);
 }
 
-/* HEADER BUTTONS */
+/* =========================
+   HEADER BUTTONS
+========================= */
 
 .header-actions{
+  flex:none;
+
   display:flex;
+  align-items:center;
   gap:5px;
 }
 
 .header-btn{
   border:1px solid var(--line);
+
   background:#0d1828;
   color:#72869e;
 
   padding:6px 10px;
+
   border-radius:4px;
 
   font-size:9px;
   font-weight:bold;
 
   cursor:pointer;
+
+  white-space:nowrap;
 }
 
 .header-btn:hover{
@@ -118,7 +145,9 @@ header{
   color:var(--green);
 }
 
-/* VIEW MENU */
+/* =========================
+   VIEW MENU
+========================= */
 
 .view-container{
   position:relative;
@@ -128,6 +157,7 @@ header{
   display:none;
 
   position:absolute;
+
   right:0;
   top:34px;
 
@@ -136,10 +166,12 @@ header{
   padding:6px;
 
   background:#0b1321;
+
   border:1px solid var(--line);
   border-radius:5px;
 
-  z-index:2000;
+  z-index:5000;
+
   box-shadow:0 10px 30px #0008;
 }
 
@@ -151,10 +183,12 @@ header{
   padding:6px 7px;
 
   color:#58708d;
+
   font-size:8px;
   letter-spacing:1px;
 
   border-bottom:1px solid #ffffff08;
+
   margin-bottom:4px;
 }
 
@@ -167,9 +201,11 @@ header{
   border-radius:3px;
 
   background:transparent;
+
   color:#8295aa;
 
   text-align:left;
+
   font-size:9px;
 
   cursor:pointer;
@@ -184,19 +220,27 @@ header{
   color:var(--cyan);
 }
 
-/* MAIN */
+/* =========================
+   MAIN
+========================= */
 
 main{
+  min-width:0;
   min-height:0;
 
   display:grid;
-  grid-template-columns:292px 1fr;
+
+  grid-template-columns:292px minmax(0,1fr);
+
   gap:7px;
 }
 
-/* SIDEBAR */
+/* =========================
+   SIDEBAR
+========================= */
 
 .sidebar{
+  min-width:0;
   min-height:0;
 
   overflow:auto;
@@ -232,6 +276,7 @@ input{
   border-radius:4px;
 
   background:var(--panel2);
+
   color:var(--text);
 
   outline:none;
@@ -257,6 +302,7 @@ input::placeholder{
   border-radius:4px;
 
   background:var(--cyan);
+
   color:#031019;
 
   font-size:9px;
@@ -274,7 +320,9 @@ input::placeholder{
   cursor:wait;
 }
 
-/* RESULT */
+/* =========================
+   RESULT
+========================= */
 
 .result{
   min-height:115px;
@@ -299,7 +347,8 @@ input::placeholder{
 
 .row{
   display:grid;
-  grid-template-columns:88px 1fr;
+
+  grid-template-columns:88px minmax(0,1fr);
 
   gap:6px;
 
@@ -316,7 +365,9 @@ input::placeholder{
   overflow-wrap:anywhere;
 }
 
-/* TERMINAL */
+/* =========================
+   TELEMETRY
+========================= */
 
 .terminal{
   min-height:100px;
@@ -334,6 +385,7 @@ input::placeholder{
   color:#70859f;
 
   font-size:8px;
+
   line-height:1.55;
 }
 
@@ -349,7 +401,9 @@ input::placeholder{
   color:var(--red);
 }
 
-/* MAP */
+/* =========================
+   MAP
+========================= */
 
 .map{
   position:relative;
@@ -368,12 +422,14 @@ input::placeholder{
   height:100%;
 }
 
-/* MAP STATUS */
+/* =========================
+   MAP STATUS
+========================= */
 
 .map-status{
   position:absolute;
 
-  z-index:999;
+  z-index:1000;
 
   left:8px;
   bottom:8px;
@@ -392,9 +448,13 @@ input::placeholder{
   pointer-events:none;
 }
 
-/* FOOTER */
+/* =========================
+   FOOTER
+========================= */
 
 footer{
+  min-width:0;
+
   border:1px solid var(--line);
   border-radius:4px;
 
@@ -419,71 +479,97 @@ footer b{
   color:var(--cyan);
 }
 
-/* LEAFLET */
+/* =========================
+   LEAFLET
+========================= */
 
 .leaflet-control-zoom a{
   background:#0b1321!important;
+
   color:#dce8f5!important;
+
   border-color:#213653!important;
 }
 
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip{
   background:#0b1524;
+
   color:#dce8f5;
 }
 
-/* CYBER DARK MAP
-   Uses the reliable Esri street layer with a
-   visual dark filter instead of an unreliable tile server.
-*/
+/* =========================
+   CYBER DARK
+========================= */
 
 .cyber-dark-tiles{
   filter:
-    brightness(.55)
+    brightness(.52)
     contrast(1.15)
     saturate(.55)
     hue-rotate(8deg);
 }
 
+/* =====================================================
+   IMPORTANT:
+   DO NOT switch the entire application to mobile
+   simply because the browser viewport becomes narrow
+   while the user is zooming the MAP.
+===================================================== */
 
-/* MOBILE */
+/* Only use the compact layout on an actual portrait
+   device. Landscape tablet stays in the main layout. */
 
-@media(max-width:750px){
+@media(max-width:600px) and (orientation:portrait){
 
-  main{
-    grid-template-columns:245px 1fr;
+  .app{
+    height:100vh;
+    min-height:100vh;
+
+    grid-template-rows:46px 1fr 23px;
+  }
+
+  header{
+    padding:6px 8px;
   }
 
   .logo{
-    font-size:11px;
+    font-size:10px;
   }
 
   .header-btn{
     padding:6px 7px;
   }
-}
-
-@media(max-width:600px){
-
-  html,body{
-    overflow:auto;
-  }
-
-  .app{
-    height:auto;
-    min-height:100vh;
-
-    grid-template-rows:46px auto 23px;
-  }
 
   main{
     grid-template-columns:1fr;
-    grid-template-rows:auto 56vh;
+    grid-template-rows:250px minmax(400px,1fr);
   }
 
   .map{
     min-height:400px;
+  }
+}
+
+/* Very small portrait screens */
+
+@media(max-width:400px) and (orientation:portrait){
+
+  .logo span{
+    display:none;
+  }
+
+  .logo{
+    font-size:9px;
+  }
+
+  .header-btn{
+    padding:5px 6px;
+    font-size:8px;
+  }
+
+  main{
+    grid-template-rows:230px minmax(400px,1fr);
   }
 }
 </style>
@@ -493,11 +579,14 @@ footer b{
 
 <div class="app">
 
-<!-- HEADER -->
+<!-- =========================
+     HEADER
+========================= -->
 
 <header>
 
   <div class="logo">
+
     <div class="logo-dot"></div>
 
     ArgusScope
@@ -505,12 +594,13 @@ footer b{
     <span>//</span>
 
     INTELLIGENCE ENGINE
+
   </div>
 
 
   <div class="header-actions">
 
-    <!-- VIEW MENU -->
+    <!-- MAP VIEWS -->
 
     <div class="view-container">
 
@@ -521,6 +611,7 @@ footer b{
         ◈ VIEWS ▾
       </button>
 
+
       <div
         class="view-menu"
         id="viewMenu"
@@ -530,12 +621,14 @@ footer b{
           MAP VIEW
         </div>
 
+
         <button
           class="view-option active"
           data-view="satellite"
         >
           ◈ ESRI SATELLITE
         </button>
+
 
         <button
           class="view-option"
@@ -544,12 +637,14 @@ footer b{
           □ OPENSTREETMAP
         </button>
 
+
         <button
           class="view-option"
           data-view="dark"
         >
           ◉ CYBER DARK
         </button>
+
 
         <button
           class="view-option"
@@ -563,7 +658,7 @@ footer b{
     </div>
 
 
-    <!-- SEPARATE GPS BUTTON -->
+    <!-- DEVICE GPS IS SEPARATE -->
 
     <button
       class="header-btn gps"
@@ -577,121 +672,130 @@ footer b{
 </header>
 
 
-<!-- MAIN -->
+<!-- =========================
+     MAIN
+========================= -->
 
 <main>
 
-<!-- SIDEBAR -->
-
-<aside class="sidebar">
+  <aside class="sidebar">
 
 
-  <!-- IP -->
+    <!-- IP LOOKUP -->
 
-  <section class="section">
+    <section class="section">
 
-    <div class="title">
-      // 01. STANDARD IP LOOKUP
-    </div>
-
-    <input
-      id="ip"
-      type="text"
-      inputmode="decimal"
-      autocomplete="off"
-      placeholder="Enter target IP (e.g. 8.8.8.8)"
-    >
-
-    <button
-      class="action"
-      id="ipButton"
-    >
-      EXECUTE IP SEARCH
-    </button>
-
-  </section>
+      <div class="title">
+        // 01. STANDARD IP LOOKUP
+      </div>
 
 
-  <!-- BSSID -->
-
-  <section class="section">
-
-    <div class="title">
-      // 02. WIGLE BSSID LOOKUP
-    </div>
-
-    <input
-      id="bssid"
-      type="text"
-      autocomplete="off"
-      placeholder="AA:BB:CC:DD:EE:FF"
-    >
-
-    <button
-      class="action green"
-      id="bssidButton"
-    >
-      LOCATE BSSID
-    </button>
-
-  </section>
+      <input
+        id="ip"
+        type="text"
+        inputmode="decimal"
+        autocomplete="off"
+        placeholder="Enter target IP (e.g. 8.8.8.8)"
+      >
 
 
-  <!-- RESULT -->
+      <button
+        class="action"
+        id="ipButton"
+      >
+        EXECUTE IP SEARCH
+      </button>
 
-  <section class="section">
+    </section>
 
-    <div class="title">
-      // 03. INTELLIGENCE
-    </div>
+
+    <!-- BSSID -->
+
+    <section class="section">
+
+      <div class="title">
+        // 02. WIGLE BSSID LOOKUP
+      </div>
+
+
+      <input
+        id="bssid"
+        type="text"
+        autocomplete="off"
+        placeholder="AA:BB:CC:DD:EE:FF"
+      >
+
+
+      <button
+        class="action green"
+        id="bssidButton"
+      >
+        LOCATE BSSID
+      </button>
+
+    </section>
+
+
+    <!-- INTELLIGENCE -->
+
+    <section class="section">
+
+      <div class="title">
+        // 03. INTELLIGENCE
+      </div>
+
+
+      <div
+        class="result empty"
+        id="result"
+      >
+        Awaiting target...
+      </div>
+
+    </section>
+
+
+    <!-- TELEMETRY -->
+
+    <section class="section">
+
+      <div class="title">
+        // 04. TELEMETRY
+      </div>
+
+
+      <div
+        class="terminal"
+        id="terminal"
+      ></div>
+
+    </section>
+
+  </aside>
+
+
+  <!-- MAP -->
+
+  <section class="map">
+
+    <div id="map"></div>
+
 
     <div
-      class="result empty"
-      id="result"
+      class="map-status"
+      id="mapStatus"
     >
-      Awaiting target...
+      MAP // READY
     </div>
 
   </section>
-
-
-  <!-- TELEMETRY -->
-
-  <section class="section">
-
-    <div class="title">
-      // 04. TELEMETRY
-    </div>
-
-    <div
-      class="terminal"
-      id="terminal"
-    ></div>
-
-  </section>
-
-</aside>
-
-
-<!-- MAP -->
-
-<section class="map">
-
-  <div id="map"></div>
-
-  <div
-    class="map-status"
-    id="mapStatus"
-  >
-    MAP // READY
-  </div>
-
-</section>
 
 </main>
 
 
-<!-- FOOTER -->
+<!-- =========================
+     FOOTER
+========================= -->
 
 <footer>
 
@@ -719,7 +823,7 @@ footer b{
 <script>
 
 /* =====================================================
-   ARGUSSCOPE CONFIGURATION
+   ARGUSSCOPE CONFIG
 ===================================================== */
 
 const API =
@@ -727,14 +831,22 @@ const API =
 
 
 /* =====================================================
-   MAP
+   MAP INITIALIZATION
 ===================================================== */
 
 const map =
-L.map("map").setView([20,0],2);
+L.map("map",{
+  zoomControl:true,
+  attributionControl:true
+}).setView([20,0],2);
 
 
-/* SATELLITE */
+/* =====================================================
+   MAP LAYERS
+===================================================== */
+
+
+/* ESRI SATELLITE */
 
 const satellite =
 L.tileLayer(
@@ -758,66 +870,65 @@ L.tileLayer(
 );
 
 
-/* CYBER DARK
-   Same reliable Esri street map,
-   visually transformed with CSS.
-*/
+/* CYBER DARK */
 
 const cyberDark =
 L.tileLayer(
 "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
 {
   maxZoom:19,
-  attribution:"Esri",
-  className:"cyber-dark-tiles"
-}
-);
+  attribution:"Esri"
+});
 
 
-/* TARGET */
+/* =====================================================
+   TARGET STATE
+===================================================== */
 
-let targetMarker = null;
-let accuracyCircle = null;
+let targetMarker=null;
 
-let lastLatitude = null;
-let lastLongitude = null;
+let accuracyCircle=null;
+
+let lastLatitude=null;
+
+let lastLongitude=null;
 
 
 /* =====================================================
    ELEMENTS
 ===================================================== */
 
-const ip =
+const ip=
 document.getElementById("ip");
 
-const bssid =
+const bssid=
 document.getElementById("bssid");
 
-const ipButton =
+const ipButton=
 document.getElementById("ipButton");
 
-const bssidButton =
+const bssidButton=
 document.getElementById("bssidButton");
 
-const result =
+const result=
 document.getElementById("result");
 
-const terminal =
+const terminal=
 document.getElementById("terminal");
 
-const mapStatus =
+const mapStatus=
 document.getElementById("mapStatus");
 
-const source =
+const source=
 document.getElementById("source");
 
-const coordinates =
+const coordinates=
 document.getElementById("coordinates");
 
-const viewButton =
+const viewButton=
 document.getElementById("viewButton");
 
-const viewMenu =
+const viewMenu=
 document.getElementById("viewMenu");
 
 
@@ -827,12 +938,12 @@ document.getElementById("viewMenu");
 
 function log(message,type="info"){
 
-  const line =
+  const line=
   document.createElement("div");
 
-  line.className = type;
+  line.className=type;
 
-  line.textContent =
+  line.textContent=
   "["+
   new Date().toLocaleTimeString()+
   "] "+
@@ -840,13 +951,13 @@ function log(message,type="info"){
 
   terminal.appendChild(line);
 
-  terminal.scrollTop =
+  terminal.scrollTop=
   terminal.scrollHeight;
 }
 
 
 /* =====================================================
-   RESULT DISPLAY
+   DISPLAY RESULT
 ===================================================== */
 
 function displayResult(data){
@@ -855,39 +966,61 @@ function displayResult(data){
 
   result.innerHTML="";
 
+
   const fields=[
 
-    ["IP / BSSID",
-     data.ip || data.bssid],
+    [
+      "IP / BSSID",
+      data.ip || data.bssid
+    ],
 
-    ["NETWORK",
-     data.ssid],
+    [
+      "NETWORK",
+      data.ssid
+    ],
 
-    ["CITY",
-     data.city],
+    [
+      "CITY",
+      data.city
+    ],
 
-    ["COUNTRY",
-     data.country],
+    [
+      "COUNTRY",
+      data.country
+    ],
 
-    ["LATITUDE",
-     data.latitude],
+    [
+      "LATITUDE",
+      data.latitude
+    ],
 
-    ["LONGITUDE",
-     data.longitude],
+    [
+      "LONGITUDE",
+      data.longitude
+    ],
 
-    ["CONFIDENCE",
-     data.confidence],
+    [
+      "CONFIDENCE",
+      data.confidence
+    ],
 
-    ["RADIUS",
-     data.accuracy_radius_m != null
-     ? data.accuracy_radius_m+" m"
-     : null],
+    [
+      "RADIUS",
+      data.accuracy_radius_m != null
+      ? data.accuracy_radius_m+" m"
+      : null
+    ],
 
-    ["OBSERVATIONS",
-     data.observations || data.cluster_size],
+    [
+      "OBSERVATIONS",
+      data.observations ||
+      data.cluster_size
+    ],
 
-    ["SOURCE",
-     data.source]
+    [
+      "SOURCE",
+      data.source
+    ]
 
   ];
 
@@ -896,18 +1029,21 @@ function displayResult(data){
     ([key,value])=>{
 
       if(
-        value === undefined ||
-        value === null
-      ) return;
+        value===undefined ||
+        value===null ||
+        value===""
+      ){
+        return;
+      }
 
 
-      const row =
+      const row=
       document.createElement("div");
 
       row.className="row";
 
 
-      const keyElement =
+      const keyElement=
       document.createElement("div");
 
       keyElement.className="key";
@@ -915,7 +1051,7 @@ function displayResult(data){
       keyElement.textContent=key;
 
 
-      const valueElement =
+      const valueElement=
       document.createElement("div");
 
       valueElement.className="value";
@@ -940,10 +1076,10 @@ function displayResult(data){
 
 function plotTarget(data){
 
-  const lat =
+  const lat=
   Number(data.latitude);
 
-  const lon =
+  const lon=
   Number(data.longitude);
 
 
@@ -959,21 +1095,24 @@ function plotTarget(data){
 
 
   lastLatitude=lat;
+
   lastLongitude=lon;
 
 
-  /* REMOVE OLD */
+  /* REMOVE PREVIOUS TARGET */
 
-  if(targetMarker)
+  if(targetMarker){
     map.removeLayer(targetMarker);
+  }
 
-  if(accuracyCircle)
+  if(accuracyCircle){
     map.removeLayer(accuracyCircle);
+  }
 
 
-  /* MARKER */
+  /* TARGET MARKER */
 
-  targetMarker =
+  targetMarker=
   L.marker([lat,lon])
   .addTo(map);
 
@@ -985,18 +1124,18 @@ function plotTarget(data){
   ).openPopup();
 
 
-  /* ACCURACY */
+  /* ACCURACY CIRCLE */
 
-  const radius =
+  const radius=
   Number(data.accuracy_radius_m);
 
 
   if(
     Number.isFinite(radius) &&
-    radius > 0
+    radius>0
   ){
 
-    accuracyCircle =
+    accuracyCircle=
     L.circle(
       [lat,lon],
       {
@@ -1012,24 +1151,32 @@ function plotTarget(data){
         weight:1
       }
     ).addTo(map);
+
   }
 
 
-  /* ZOOM */
+  /* CHOOSE ZOOM */
 
   let zoom=8;
 
-  if(radius>50000)
+
+  if(radius>50000){
+
     zoom=5;
 
-  else if(radius>10000)
+  }else if(radius>10000){
+
     zoom=7;
 
-  else if(radius>1000)
+  }else if(radius>1000){
+
     zoom=10;
 
-  else
+  }else{
+
     zoom=13;
+
+  }
 
 
   map.setView(
@@ -1038,16 +1185,18 @@ function plotTarget(data){
   );
 
 
-  mapStatus.textContent =
+  mapStatus.textContent=
   `MAP // ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
 
 
-  coordinates.textContent =
+  coordinates.textContent=
   `COORD // ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
 
 
-  source.textContent =
-  `SOURCE // ${data.source || "UNKNOWN"}`;
+  source.textContent=
+  `SOURCE // ${
+    data.source || "UNKNOWN"
+  }`;
 }
 
 
@@ -1057,7 +1206,7 @@ function plotTarget(data){
 
 async function locateIP(){
 
-  const target =
+  const target=
   ip.value.trim();
 
 
@@ -1086,7 +1235,7 @@ async function locateIP(){
 
   try{
 
-    const response =
+    const response=
     await fetch(
       API+
       "/api/v1/locate-ip?ip="+
@@ -1100,15 +1249,21 @@ async function locateIP(){
         "Backend HTTP "+
         response.status
       );
+
     }
 
 
-    const data =
+    const data=
     await response.json();
 
 
-    if(data.error)
-      throw new Error(data.error);
+    if(data.error){
+
+      throw new Error(
+        data.error
+      );
+
+    }
 
 
     displayResult(data);
@@ -1117,13 +1272,19 @@ async function locateIP(){
 
 
     log(
-      `IP resolved: ${data.ip || target}`,
+      `IP resolved: ${
+        data.ip || target
+      }`,
       "ok"
     );
 
 
     log(
-      `Coordinates: ${data.latitude}, ${data.longitude}`,
+      `Coordinates: ${
+        data.latitude
+      }, ${
+        data.longitude
+      }`,
       "info"
     );
 
@@ -1136,10 +1297,12 @@ async function locateIP(){
     result.textContent=
     error.message;
 
+
     log(
       error.message,
       "err"
     );
+
 
   }finally{
 
@@ -1147,6 +1310,7 @@ async function locateIP(){
 
     ipButton.textContent=
     "EXECUTE IP SEARCH";
+
   }
 }
 
@@ -1157,7 +1321,7 @@ async function locateIP(){
 
 async function locateBSSID(){
 
-  const target =
+  const target=
   bssid.value.trim();
 
 
@@ -1186,7 +1350,7 @@ async function locateBSSID(){
 
   try{
 
-    const response =
+    const response=
     await fetch(
       API+
       "/api/v1/locate-bssid?netid="+
@@ -1200,15 +1364,21 @@ async function locateBSSID(){
         "Backend HTTP "+
         response.status
       );
+
     }
 
 
-    const data =
+    const data=
     await response.json();
 
 
-    if(data.error)
-      throw new Error(data.error);
+    if(data.error){
+
+      throw new Error(
+        data.error
+      );
+
+    }
 
 
     displayResult(data);
@@ -1230,10 +1400,12 @@ async function locateBSSID(){
     result.textContent=
     error.message;
 
+
     log(
       error.message,
       "err"
     );
+
 
   }finally{
 
@@ -1241,6 +1413,7 @@ async function locateBSSID(){
 
     bssidButton.textContent=
     "LOCATE BSSID";
+
   }
 }
 
@@ -1275,13 +1448,13 @@ document
 
     position=>{
 
-      const lat =
+      const lat=
       position.coords.latitude;
 
-      const lon =
+      const lon=
       position.coords.longitude;
 
-      const accuracy =
+      const accuracy=
       position.coords.accuracy;
 
 
@@ -1291,7 +1464,9 @@ document
         `<b>DEVICE GPS</b><br>
          ${lat.toFixed(5)},
          ${lon.toFixed(5)}<br>
-         Accuracy: ${Math.round(accuracy)} m`
+         Accuracy: ${
+           Math.round(accuracy)
+         } m`
       )
       .openPopup();
 
@@ -1302,12 +1477,21 @@ document
       );
 
 
+      mapStatus.textContent=
+      `MAP // DEVICE GPS`;
+
+
       log(
-        `Device GPS: ${lat.toFixed(5)}, ${lon.toFixed(5)}`,
+        `Device GPS: ${
+          lat.toFixed(5)
+        }, ${
+          lon.toFixed(5)
+        }`,
         "ok"
       );
 
     },
+
 
     error=>{
 
@@ -1318,6 +1502,7 @@ document
       );
 
     },
+
 
     {
       enableHighAccuracy:true,
@@ -1340,7 +1525,9 @@ event=>{
 
   event.stopPropagation();
 
-  viewMenu.classList.toggle("open");
+  viewMenu.classList.toggle(
+    "open"
+  );
 
 });
 
@@ -1351,12 +1538,13 @@ event=>{
 
   if(
     !viewMenu.contains(event.target) &&
-    event.target !== viewButton
+    event.target!==viewButton
   ){
 
     viewMenu.classList.remove(
       "open"
     );
+
   }
 
 });
@@ -1367,30 +1555,35 @@ event=>{
 ===================================================== */
 
 document
-.querySelectorAll(".view-option[data-view]")
+.querySelectorAll(
+  ".view-option[data-view]"
+)
 .forEach(button=>{
 
   button.addEventListener(
     "click",
     ()=>{
 
-      const view =
+      const view=
       button.dataset.view;
 
 
-      /* REMOVE CURRENT */
+      /* REMOVE CURRENT MAP */
 
-      if(map.hasLayer(satellite))
+      if(map.hasLayer(satellite)){
         map.removeLayer(satellite);
+      }
 
-      if(map.hasLayer(osm))
+      if(map.hasLayer(osm)){
         map.removeLayer(osm);
+      }
 
-      if(map.hasLayer(cyberDark))
+      if(map.hasLayer(cyberDark)){
         map.removeLayer(cyberDark);
+      }
 
 
-      /* ADD NEW */
+      /* ADD SELECTED MAP */
 
       if(view==="satellite"){
 
@@ -1398,6 +1591,7 @@ document
 
         mapStatus.textContent=
         "MAP // ESRI SATELLITE";
+
       }
 
 
@@ -1407,6 +1601,7 @@ document
 
         mapStatus.textContent=
         "MAP // OPENSTREETMAP";
+
       }
 
 
@@ -1416,21 +1611,27 @@ document
 
         mapStatus.textContent=
         "MAP // CYBER DARK";
+
       }
 
 
-      /* ACTIVE */
+      /* ACTIVE BUTTON */
 
       document
       .querySelectorAll(
-        ".view-option"
+        ".view-option[data-view]"
       )
       .forEach(
-        b=>b.classList.remove("active")
+        b=>
+        b.classList.remove(
+          "active"
+        )
       );
 
 
-      button.classList.add("active");
+      button.classList.add(
+        "active"
+      );
 
 
       viewMenu.classList.remove(
@@ -1460,8 +1661,8 @@ document
 ()=>{
 
   if(
-    lastLatitude === null ||
-    lastLongitude === null
+    lastLatitude===null ||
+    lastLongitude===null
   ){
 
     log(
@@ -1473,7 +1674,7 @@ document
   }
 
 
-  const url =
+  const url=
   "https://www.google.com/maps/search/?api=1"+
   "&query="+
   encodeURIComponent(
@@ -1503,13 +1704,14 @@ document
 
 
 /* =====================================================
-   INPUTS
+   INPUT CONTROLS
 ===================================================== */
 
-ipButton.onclick =
+ipButton.onclick=
 locateIP;
 
-bssidButton.onclick =
+
+bssidButton.onclick=
 locateBSSID;
 
 
@@ -1517,8 +1719,9 @@ ip.addEventListener(
 "keydown",
 event=>{
 
-  if(event.key==="Enter")
+  if(event.key==="Enter"){
     locateIP();
+  }
 
 });
 
@@ -1527,8 +1730,9 @@ bssid.addEventListener(
 "keydown",
 event=>{
 
-  if(event.key==="Enter")
+  if(event.key==="Enter"){
     locateBSSID();
+  }
 
 });
 
