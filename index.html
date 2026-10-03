@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ArgusScope // OSINT Recon</title>
+    <title>ArgusScope // WiGLE ENGINE</title>
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -78,23 +78,10 @@
             border-color: var(--accent-cyan);
         }
 
-        .status-badge {
-            color: var(--accent-green);
-            font-size: 0.75rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-left: 10px;
-        }
-
-        .status-badge::before {
-            content: '';
-            width: 8px;
-            height: 8px;
-            background-color: var(--accent-green);
-            border-radius: 50%;
-            display: inline-block;
+        .nav-btn#gpsBtn {
+            background-color: #065f46;
+            color: #ecfdf5;
+            border-color: var(--accent-green);
         }
 
         /* Workspace Layout */
@@ -115,7 +102,7 @@
             flex-direction: column;
             padding: 20px;
             overflow-y: auto;
-            gap: 20px;
+            gap: 15px;
         }
 
         .section-title {
@@ -126,43 +113,20 @@
             letter-spacing: 0.5px;
         }
 
-        /* EXIF Drop Zone */
-        .exif-dropzone {
-            background-color: #030712;
-            border: 1px dashed var(--border-color);
-            border-radius: 4px;
-            padding: 20px;
-            text-align: center;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: border-color 0.2s;
-        }
-
-        .exif-dropzone:hover {
-            border-color: var(--accent-cyan);
-            color: var(--text-main);
-        }
-
-        .exif-dropzone span {
-            color: var(--accent-cyan);
-            font-weight: bold;
-        }
-
-        /* Network Locator Input Row */
-        .input-row {
+        .control-group {
             display: flex;
-            gap: 10px;
+            flex-direction: column;
         }
 
         input[type="text"] {
-            flex-grow: 1;
+            width: 100%;
             background-color: #030712;
             border: 1px solid var(--border-color);
             color: var(--text-main);
             padding: 10px;
             border-radius: 4px;
             font-size: 0.9rem;
+            margin-bottom: 8px;
         }
 
         input[type="text"]:focus {
@@ -170,11 +134,12 @@
             border-color: var(--accent-cyan);
         }
 
-        button.query-btn {
+        button.action-btn {
+            width: 100%;
             background-color: var(--accent-cyan);
             color: #030712;
             border: none;
-            padding: 0 20px;
+            padding: 10px;
             font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
@@ -182,37 +147,22 @@
             letter-spacing: 0.5px;
         }
 
-        button.query-btn:hover {
+        button.action-btn:hover {
             opacity: 0.9;
         }
 
-        /* Intelligence Report Card */
-        .report-card {
+        /* Telemetry Terminal Output */
+        .terminal {
             background-color: #030712;
             border: 1px solid var(--border-color);
             border-radius: 4px;
-            padding: 15px;
-            font-size: 0.8rem;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .report-row {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid #111827;
-            padding-bottom: 6px;
-        }
-
-        .report-label {
-            color: var(--text-muted);
-        }
-
-        .report-value {
-            color: var(--text-main);
-            text-align: right;
-            font-weight: bold;
+            padding: 12px;
+            font-size: 0.75rem;
+            color: #ef4444; /* Error/status color matching screenshot */
+            height: 180px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
         }
 
         /* Map Container */
@@ -228,13 +178,13 @@
     <!-- Top Navigation Bar -->
     <div class="navbar">
         <div class="brand">
-            <span>ARGUSSCOPE // OSINT RECON</span>
+            <span>ArgusScope // WiGLE ENGINE</span>
         </div>
         <div class="nav-controls">
-            <button class="nav-btn" onclick="setMapLayer('dark')">Cyber Dark</button>
-            <button class="nav-btn active" onclick="setMapLayer('satellite')">Satellite</button>
-            <button class="nav-btn" onclick="setMapLayer('topo')">3D Topo</button>
-            <div class="status-badge">API Online</div>
+            <button class="nav-btn" id="gpsBtn" onclick="triggerHardwareGps()">Hardware GPS</button>
+            <button class="nav-btn" onclick="setMapLayer('google')" id="btnGoogle">Google HD</button>
+            <button class="nav-btn active" onclick="setMapLayer('esri')" id="btnEsri">Esri Satellite</button>
+            <button class="nav-btn" onclick="setMapLayer('dark')" id="btnDark">Cyber Dark</button>
         </div>
     </div>
 
@@ -243,49 +193,24 @@
         <!-- Sidebar Control Panel -->
         <div class="sidebar">
             
-            <!-- 01. Image EXIF Extraction -->
+            <!-- 01. Standard IP Lookup -->
             <div class="control-group">
-                <div class="section-title">// 01. Image EXIF Extraction</div>
-                <div class="exif-dropzone" onclick="document.getElementById('fileInput').click()">
-                    Drop Image or <span>Click to Select</span>
-                    <input type="file" id="fileInput" style="display: none;" accept="image/*" onchange="handleImageExif(this)">
-                </div>
+                <div class="section-title">// 01. Standard IP Lookup</div>
+                <input type="text" id="ipInput" placeholder="Enter Target IP (e.g., 184.84.167.84)">
+                <button class="action-btn" onclick="executeIpSearch()">Execute IP Search</button>
             </div>
 
-            <!-- 02. Network Locator -->
+            <!-- 02. WiGLE BSSID Triangulation -->
             <div class="control-group">
-                <div class="section-title">// 02. Network Locator</div>
-                <div class="input-row">
-                    <input type="text" id="ipInput" placeholder="Enter target IP (e.g., 117.200.0.1)">
-                    <button class="query-btn" onclick="executeReconSearch()">Query</button>
-                </div>
+                <div class="section-title">// 02. WiGLE BSSID Triangulation</div>
+                <input type="text" id="bssidInput" value="1C:F2:9A:BC:FB:20" placeholder="Single BSSID or cluster">
+                <button class="action-btn" style="background-color: var(--accent-green); color: #030712;" onclick="executeBssidSearch()">Triangulate BSSID</button>
             </div>
 
-            <!-- 03. Intelligence Report -->
+            <!-- 03. Telemetry Terminal -->
             <div class="control-group" style="flex-grow: 1; display: flex; flex-direction: column;">
-                <div class="section-title">// 03. Intelligence Report</div>
-                <div class="report-card">
-                    <div class="report-row">
-                        <span class="report-label">TARGET IP</span>
-                        <span class="report-value" id="resIp">-</span>
-                    </div>
-                    <div class="report-row">
-                        <span class="report-label">CITY</span>
-                        <span class="report-value" id="resCity">-</span>
-                    </div>
-                    <div class="report-row">
-                        <span class="report-label">COUNTRY</span>
-                        <span class="report-value" id="resCountry">-</span>
-                    </div>
-                    <div class="report-row">
-                        <span class="report-label">PROVIDER</span>
-                        <span class="report-value" id="resProvider">-</span>
-                    </div>
-                    <div class="report-row" style="border-bottom: none;">
-                        <span class="report-label">LAT / LNG</span>
-                        <span class="report-value" id="resCoords">-</span>
-                    </div>
-                </div>
+                <div class="section-title">// 03. Telemetry Terminal</div>
+                <div id="telemetryOutput" class="terminal">System initialized. Awaiting target acquisition parameters...</div>
             </div>
 
         </div>
@@ -299,81 +224,159 @@
     
     <script>
         // Initialize Map
-        const map = L.map('map').setView([20.0, 0.0], 2);
+        const map = L.map('map').setView([30.0, 10.0], 3);
 
-        // Map Layers (Featuring High-Resolution Esri HD Satellite Imagery)
+        // Map Layers
         const layers = {
-            satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            esri: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
                 maxZoom: 19,
-                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, swisstopo, and the GIS User Community'
+                attribution: 'Tiles &copy; Esri'
+            }),
+            google: L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+                attribution: '&copy; Google Maps'
             }),
             dark: L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 subdomains: 'abcd',
                 attribution: '&copy; CARTO'
-            }),
-            topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-                maxZoom: 17,
-                attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM'
             })
         };
 
-        // Default to HD Satellite view
-        layers.satellite.addTo(map);
+        // Default to Esri Satellite view
+        layers.esri.addTo(map);
 
         function setMapLayer(type) {
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            document.querySelectorAll('.nav-btn:not(#gpsBtn)').forEach(btn => btn.classList.remove('active'));
+            if (type === 'esri') document.getElementById('btnEsri').classList.add('active');
+            if (type === 'google') document.getElementById('btnGoogle').classList.add('active');
+            if (type === 'dark') document.getElementById('btnDark').classList.add('active');
 
             Object.values(layers).forEach(l => map.removeLayer(l));
             layers[type].addTo(map);
         }
 
         let currentMarker = null;
+        let currentCircle = null;
         const BACKEND_URL = "https://argusscope-backend.onrender.com";
 
-        function renderTarget(lat, lon, info) {
+        function renderMapPosition(lat, lon, radiusMeters, titleInfo) {
             if (currentMarker) map.removeLayer(currentMarker);
+            if (currentCircle) map.removeLayer(currentCircle);
 
             currentMarker = L.marker([lat, lon]).addTo(map)
-                .bindPopup(`<b>IP: ${info.ip}</b><br>LAT: ${lat}<br>LNG: ${lon}`).openPopup();
+                .bindPopup(`<b>${titleInfo}</b><br>Lat: ${lat}<br>Lon: ${lon}`).openPopup();
 
-            map.setView([lat, lon], 13);
+            if (radiusMeters) {
+                currentCircle = L.circle([lat, lon], {
+                    radius: radiusMeters,
+                    color: '#06b6d4',
+                    fillColor: '#06b6d4',
+                    fillOpacity: 0.15
+                }).addTo(map);
+            }
+
+            map.setView([lat, lon], 16);
         }
 
-        async function executeReconSearch() {
+        async function executeIpSearch() {
             const ip = document.getElementById("ipInput").value.trim();
             if (!ip) return;
 
-            document.getElementById("resIp").innerText = "Querying...";
+            const terminal = document.getElementById("telemetryOutput");
+            terminal.style.color = "var(--accent-cyan)";
+            terminal.innerText = `Querying IP telemetry for ${ip}...`;
 
             try {
                 const response = await fetch(`${BACKEND_URL}/api/v1/locate-ip?ip=${encodeURIComponent(ip)}`);
                 const data = await response.json();
 
-                if (data.latitude && data.longitude) {
-                    document.getElementById("resIp").innerText = data.ip || ip;
-                    document.getElementById("resCity").innerText = data.city || 'Unknown';
-                    document.getElementById("resCountry").innerText = data.country || 'N/A';
-                    document.getElementById("resProvider").innerText = data.isp || 'N/A';
-                    document.getElementById("resCoords").innerText = `${data.latitude}, ${data.longitude}`;
+                terminal.innerText = JSON.stringify(data, null, 2);
 
-                    renderTarget(data.latitude, data.longitude, data);
+                if (data.latitude && data.longitude) {
+                    renderMapPosition(data.latitude, data.longitude, data.accuracy_radius_m || 5000, `IP Target: ${data.ip}`);
                 } else {
-                    alert("Query failed: " + (data.error || "Target not found"));
-                    document.getElementById("resIp").innerText = "-";
+                    terminal.style.color = "#ef4444";
+                    terminal.innerText = "IP resolution failed: " + (data.error || "Unknown error");
                 }
             } catch (err) {
-                console.error("Network Error:", err);
-                alert("Critical network error connecting to backend.");
-                document.getElementById("resIp").innerText = "Error";
+                terminal.style.color = "#ef4444";
+                terminal.innerText = `Critical Network Error: ${err.message}`;
             }
         }
 
-        function handleImageExif(input) {
-            if (input.files && input.files[0]) {
-                alert(`Selected image: ${input.files[0].name}. Ready for EXIF parsing integration.`);
+        async function executeBssidSearch() {
+            const rawInput = document.getElementById("bssidInput").value.trim();
+            if (!rawInput) return;
+
+            const macList = rawInput.split(',').map(m => m.trim()).filter(m => m.length > 0);
+            const terminal = document.getElementById("telemetryOutput");
+            terminal.style.color = "var(--accent-cyan)";
+            
+            let endpoint = "";
+            let options = {};
+
+            if (macList.length > 1) {
+                endpoint = `${BACKEND_URL}/api/v1/triangulate-cluster`;
+                options = {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        scans: macList.map(mac => ({ netid: mac, rssi: -65 })) 
+                    })
+                };
+                terminal.innerText = `Computing multi-point sensor fusion across ${macList.length} nodes...`;
+            } else {
+                endpoint = `${BACKEND_URL}/api/v1/locate-bssid?netid=${encodeURIComponent(macList[0])}`;
+                options = { method: "GET" };
+                terminal.innerText = `Querying single BSSID telemetry for ${macList[0]}...`;
             }
+
+            try {
+                const response = await fetch(endpoint, options);
+                const data = await response.json();
+
+                terminal.innerText = JSON.stringify(data, null, 2);
+
+                if (data.latitude && data.longitude) {
+                    const label = data.cluster_size ? `Cluster Target (${data.cluster_size} Nodes)` : `BSSID: ${data.bssid || macList[0]}`;
+                    renderMapPosition(data.latitude, data.longitude, data.accuracy_radius_m || 25, label);
+                } else {
+                    terminal.style.color = "#ef4444";
+                    terminal.innerText = data.error || "BSSID not found in WiGLE database";
+                }
+            } catch (err) {
+                terminal.style.color = "#ef4444";
+                terminal.innerText = `BSSID not found in WiGLE database (${err.message})`;
+            }
+        }
+
+        function triggerHardwareGps() {
+            const terminal = document.getElementById("telemetryOutput");
+            if (!navigator.geolocation) {
+                alert("Geolocation is not supported by your browser");
+                return;
+            }
+
+            terminal.style.color = "var(--accent-green)";
+            terminal.innerText = "Acquiring hardware GPS coordinates...";
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+
+                    terminal.innerText = `GPS Lock Acquired:\nLat: ${lat}\nLon: ${lon}\nAccuracy: ±${accuracy}m`;
+                    renderMapPosition(lat, lon, accuracy, "Hardware GPS Target");
+                },
+                (error) => {
+                    terminal.style.color = "#ef4444";
+                    terminal.innerText = `GPS Acquisition Failed: ${error.message}`;
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
         }
     </script>
 </body>
