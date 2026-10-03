@@ -42,7 +42,7 @@
 
   <header>
     <h1>ARGUSSCOPE</h1>
-    <span class="status-badge" id="statusBadge">● FRONTEND READY</span>
+    <span class="status-badge" id="statusBadge">● SYSTEM READY</span>
   </header>
 
   <div class="dashboard">
@@ -79,8 +79,8 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   
   <script>
-    // Leave this empty for now — we will paste your live Cloudflare API domain here later!
-    const API_URL = "YOUR_BACKEND_URL_HERE"; 
+    // Replace the URL below with your actual Render web service URL (e.g., https://argusscope-backend.onrender.com)
+    const API_URL = "https://argusscope-backend.onrender.com"; 
 
     // Initialize Map with Esri Satellite Imagery
     const map = L.map('map').setView([20, 0], 2);
@@ -107,11 +107,6 @@
       if (!file) return;
       document.getElementById('fileLabel').innerText = file.name;
       document.getElementById('summary').innerHTML = "<i>Analyzing image metadata...</i>";
-
-      if (API_URL === "YOUR_BACKEND_URL_HERE") {
-        document.getElementById('summary').innerText = "Frontend active! Connect a backend URL to test live extraction.";
-        return;
-      }
 
       const formData = new FormData();
       formData.append("file", file);
@@ -140,11 +135,6 @@
       const ip = document.getElementById('ipInput').value.trim();
       if (!ip) return;
       document.getElementById('summary').innerHTML = "<i>Locating IP network...</i>";
-
-      if (API_URL === "YOUR_BACKEND_URL_HERE") {
-        document.getElementById('summary').innerText = "Frontend active! Connect a backend URL to test live IP lookups.";
-        return;
-      }
 
       try {
         const res = await fetch(`${API_URL}/api/v1/locate-ip?ip=${ip}`);
