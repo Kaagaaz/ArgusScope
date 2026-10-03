@@ -3,110 +3,366 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ArgusScope - Geo-OSINT Recon</title>
-  
+  <title>ARGUSSCOPE // OSINT Recon Dashboard</title>
+
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  
+  <!-- Google Fonts: JetBrains Mono & Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
   <style>
+    :root {
+      --bg-main: #060913;
+      --bg-panel: #0d1322;
+      --bg-card: #131c31;
+      --border-color: #1e2d4a;
+      --border-focus: #38bdf8;
+      --accent-cyan: #38bdf8;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --text-main: #f1f5f9;
+      --text-muted: #64748b;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-sans: 'Inter', sans-serif;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 20px; }
     
-    header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid #1e293b; margin-bottom: 20px; }
-    header h1 { font-size: 1.5rem; letter-spacing: 1px; color: #38bdf8; }
-    .status-badge { background: #064e3b; color: #34d399; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; border: 1px solid #059669; }
-    
-    .dashboard { display: grid; grid-template-columns: 340px 1fr; gap: 20px; height: calc(100vh - 100px); }
-    
-    .panel { background: #1e293b; border-radius: 8px; border: 1px solid #334155; padding: 18px; display: flex; flex-direction: column; gap: 16px; }
-    .panel h3 { font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
-    
-    /* Input Modules */
-    .drop-zone { border: 2px dashed #475569; border-radius: 6px; padding: 24px; text-align: center; cursor: pointer; transition: background 0.2s, border-color 0.2s; }
-    .drop-zone:hover { border-color: #38bdf8; background: #0f172a; }
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      padding: 16px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow: hidden;
+    }
+
+    /* Header Bar */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 12px;
+      height: 12px;
+      background: var(--accent-cyan);
+      box-shadow: 0 0 10px var(--accent-cyan);
+      border-radius: 2px;
+    }
+
+    header h1 {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      letter-spacing: 2px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    header h1 span { color: var(--accent-cyan); }
+
+    .system-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #eab308;
+      box-shadow: 0 0 8px #eab308;
+    }
+
+    .status-dot.online {
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green);
+    }
+
+    /* Dashboard Grid Layout */
+    .dashboard {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 16px;
+      flex: 1;
+      min-height: 0; /* Prevents flex overflow */
+    }
+
+    /* Sidebar Control Panel */
+    .sidebar {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+    }
+
+    .section-title {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::before {
+      content: '//';
+      color: var(--text-muted);
+    }
+
+    /* Dropzone Styling */
+    .drop-zone {
+      background: var(--bg-card);
+      border: 1px dashed var(--border-color);
+      border-radius: 6px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .drop-zone:hover {
+      border-color: var(--accent-cyan);
+      background: rgba(56, 189, 248, 0.03);
+    }
+
+    .drop-zone-text {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .drop-zone-text b { color: var(--text-main); }
+
     input[type="file"] { display: none; }
-    
-    .input-group { display: flex; gap: 8px; }
-    input[type="text"] { flex: 1; background: #0f172a; border: 1px solid #334155; border-radius: 4px; padding: 10px 12px; color: #fff; font-size: 0.9rem; }
-    input[type="text"]:focus { outline: none; border-color: #38bdf8; }
-    button { background: #0284c7; color: white; border: none; padding: 10px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
-    button:hover { background: #0369a1; }
-    
-    /* Map & Results */
-    #map { width: 100%; height: 100%; border-radius: 8px; border: 1px solid #334155; }
-    .summary-box { background: #0f172a; border-radius: 6px; padding: 14px; font-size: 0.88rem; line-height: 1.6; border: 1px solid #334155; color: #cbd5e1; }
-    .summary-box b { color: #f8fafc; }
+
+    /* Input Controls */
+    .input-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 10px 12px;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+    }
+
+    .btn-action {
+      background: var(--accent-cyan);
+      color: #000;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn-action:hover { opacity: 0.9; }
+
+    /* Terminal Intelligence Log Display */
+    .intel-terminal {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 14px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .intel-row {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed var(--border-color);
+      padding: 6px 0;
+    }
+
+    .intel-row:last-child { border-bottom: none; }
+
+    .intel-key { color: var(--text-muted); }
+    .intel-val { color: var(--accent-cyan); font-weight: 500; }
+
+    /* Map Interface Styling */
+    .map-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+    }
+
+    #map { width: 100%; height: 100%; background: #000; }
+
+    /* Leaflet Dark Theme Overrides */
+    .leaflet-tile { filter: brightness(0.7) invert(1) contrast(1.2) hue-rotate(200deg) saturate(0.3); }
+    .leaflet-container { background: #060913 !important; }
+    .leaflet-popup-content-wrapper {
+      background: var(--bg-panel) !important;
+      color: var(--text-main) !important;
+      border: 1px solid var(--border-color);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      border-radius: 4px;
+    }
+    .leaflet-popup-tip { background: var(--bg-panel) !important; }
+
+    /* Responsive adjustment */
+    @media (max-width: 900px) {
+      body { height: auto; overflow: auto; }
+      .dashboard { grid-template-columns: 1fr; height: auto; }
+      .map-container { height: 450px; }
+    }
   </style>
 </head>
 <body>
 
+  <!-- Top Header Navigation -->
   <header>
-    <h1>ARGUSSCOPE</h1>
-    <span class="status-badge" id="statusBadge">● SYSTEM READY</span>
+    <div class="brand">
+      <div class="brand-logo"></div>
+      <h1>ARGUS<span>SCOPE</span> // OSINT RECON</h1>
+    </div>
+    <div class="system-status">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">CONNECTING BACKEND...</span>
+    </div>
   </header>
 
+  <!-- Main Workstation Layout -->
   <div class="dashboard">
-    <!-- Sidebar Control Panel -->
-    <div class="panel">
-      
-      <!-- Module 1: EXIF Upload -->
-      <h3>1. Image Analysis (EXIF)</h3>
+
+    <!-- Control Side-Panel -->
+    <div class="sidebar">
+
+      <!-- EXIF Analysis Section -->
+      <div class="section-title">01. Image EXIF Extraction</div>
       <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
-        <p id="fileLabel">Click or Drag Image Here</p>
+        <p class="drop-zone-text" id="fileLabel">Drop image or <b>Click to Select</b></p>
         <input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload(this.files[0])">
       </div>
 
-      <!-- Module 2: IP Lookup -->
-      <h3>2. Network Locate (IP)</h3>
+      <!-- IP Lookup Section -->
+      <div class="section-title">02. Network Locator</div>
       <div class="input-group">
-        <input type="text" id="ipInput" placeholder="e.g. 8.8.8.8">
-        <button onclick="lookupIP()">Map IP</button>
+        <input type="text" id="ipInput" placeholder="Enter target IP (e.g. 8.8.8.8)">
+        <button class="btn-action" onclick="lookupIP()">QUERY</button>
       </div>
 
-      <!-- Output Summary Panel -->
-      <h3>Target Intelligence Summary</h3>
-      <div class="summary-box" id="summary">
-        Upload an image or enter an IP address to inspect target coordinates...
+      <!-- Intelligence Output Log -->
+      <div class="section-title">03. Intelligence Report</div>
+      <div class="intel-terminal" id="intelTerminal">
+        System initialized. Select an image or query an IP address to begin telemetry extraction.
       </div>
-      
+
     </div>
 
-    <!-- Map Canvas -->
-    <div id="map"></div>
+    <!-- Satellite Map Viewport -->
+    <div class="map-container">
+      <div id="map"></div>
+    </div>
+
   </div>
 
-  <!-- Leaflet Maps Library -->
+  <!-- Leaflet JavaScript Library -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  
-  <script>
-    // Replace the URL below with your actual Render web service URL (e.g., https://argusscope-backend.onrender.com)
-    const API_URL = "https://argusscope-backend.onrender.com"; 
 
-    // Initialize Map with Esri Satellite Imagery
-    const map = L.map('map').setView([20, 0], 2);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles &copy; Esri'
+  <script>
+    // Live Render API Endpoint
+    const API_URL = "https://argusscope-backend.onrender.com";
+
+    // Initialize Map with OpenStreetMap Base
+    const map = L.map('map', { zoomControl: false }).setView([20, 0], 2);
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
     let activeMarker = null;
 
-    // Helper: Plot Pin on Map & Update Dashboard
-    function renderTarget(lat, lng, label, details) {
-      if (activeMarker) map.removeLayer(activeMarker);
-      
-      map.flyTo([lat, lng], 13);
-      activeMarker = L.marker([lat, lng]).addTo(map)
-        .bindPopup(`<b>${label}</b><br>${lat.toFixed(4)}, ${lng.toFixed(4)}`)
-        .openPopup();
+    // Check API Status on Load
+    async function checkBackendStatus() {
+      const dot = document.getElementById('statusDot');
+      const text = document.getElementById('statusText');
+      try {
+        const res = await fetch(`${API_URL}/`);
+        if (res.ok) {
+          dot.classList.add('online');
+          text.innerText = "API ONLINE";
+        } else {
+          text.innerText = "API ERROR";
+        }
+      } catch (e) {
+        text.innerText = "WAKING BACKEND...";
+        // Retry every 5s if sleeping
+        setTimeout(checkBackendStatus, 5000);
+      }
+    }
+    checkBackendStatus();
 
-      document.getElementById('summary').innerHTML = details;
+    // Plot Targeted Location on Map
+    function plotCoordinates(lat, lng, label) {
+      if (activeMarker) map.removeLayer(activeMarker);
+
+      map.flyTo([lat, lng], 13, { duration: 1.5 });
+      
+      activeMarker = L.marker([lat, lng]).addTo(map)
+        .bindPopup(`<b>${label}</b><br>LAT: ${lat.toFixed(5)}<br>LNG: ${lng.toFixed(5)}`)
+        .openPopup();
     }
 
-    // Function 1: Image EXIF Handler
+    // Process Image Upload (EXIF)
     async function handleFileUpload(file) {
       if (!file) return;
       document.getElementById('fileLabel').innerText = file.name;
-      document.getElementById('summary').innerHTML = "<i>Analyzing image metadata...</i>";
+      const log = document.getElementById('intelTerminal');
+      log.innerHTML = `Parsing EXIF metadata for: <br><span style="color:var(--accent-cyan);">${file.name}</span>...`;
 
       const formData = new FormData();
       formData.append("file", file);
@@ -116,42 +372,47 @@
         const data = await res.json();
 
         if (data.latitude && data.longitude) {
-          renderTarget(
-            data.latitude, 
-            data.longitude, 
-            file.name, 
-            `<b>File:</b> ${file.name}<br><b>Latitude:</b> ${data.latitude.toFixed(5)}<br><b>Longitude:</b> ${data.longitude.toFixed(5)}`
-          );
+          plotCoordinates(data.latitude, data.longitude, file.name);
+          log.innerHTML = `
+            <div class="intel-row"><span class="intel-key">FILE</span><span class="intel-val">${data.filename}</span></div>
+            <div class="intel-row"><span class="intel-key">LATITUDE</span><span class="intel-val">${data.latitude.toFixed(5)}</span></div>
+            <div class="intel-row"><span class="intel-key">LONGITUDE</span><span class="intel-val">${data.longitude.toFixed(5)}</span></div>
+            <div class="intel-row"><span class="intel-key">STATUS</span><span class="intel-val" style="color:var(--accent-green)">COORDINATES RESOLVED</span></div>
+          `;
         } else {
-          document.getElementById('summary').innerText = "No GPS metadata found in image EXIF.";
+          log.innerHTML = `<span style="color:var(--accent-red)">NO GPS METADATA FOUND IN IMAGE EXIF.</span>`;
         }
       } catch (err) {
-        document.getElementById('summary').innerText = "Error connecting to backend API.";
+        log.innerHTML = `<span style="color:var(--accent-red)">ERROR CONNECTING TO BACKEND API. SERVER MAY BE WAKING UP.</span>`;
       }
     }
 
-    // Function 2: IP Geolocation Handler
+    // Process IP Geolocation Search
     async function lookupIP() {
       const ip = document.getElementById('ipInput').value.trim();
       if (!ip) return;
-      document.getElementById('summary').innerHTML = "<i>Locating IP network...</i>";
+      
+      const log = document.getElementById('intelTerminal');
+      log.innerHTML = `Querying network routing info for: <br><span style="color:var(--accent-cyan);">${ip}</span>...`;
 
       try {
         const res = await fetch(`${API_URL}/api/v1/locate-ip?ip=${ip}`);
         const data = await res.json();
 
         if (data.latitude && data.longitude) {
-          renderTarget(
-            data.latitude, 
-            data.longitude, 
-            `IP: ${ip}`, 
-            `<b>Target IP:</b> ${ip}<br><b>Location:</b> ${data.city}, ${data.country}<br><b>ISP:</b> ${data.org}`
-          );
+          plotCoordinates(data.latitude, data.longitude, `IP: ${ip}`);
+          log.innerHTML = `
+            <div class="intel-row"><span class="intel-key">TARGET IP</span><span class="intel-val">${data.ip}</span></div>
+            <div class="intel-row"><span class="intel-key">CITY</span><span class="intel-val">${data.city || 'N/A'}</span></div>
+            <div class="intel-row"><span class="intel-key">COUNTRY</span><span class="intel-val">${data.country || 'N/A'}</span></div>
+            <div class="intel-row"><span class="intel-key">PROVIDER</span><span class="intel-val">${data.org || 'N/A'}</span></div>
+            <div class="intel-row"><span class="intel-key">LAT / LNG</span><span class="intel-val">${data.latitude}, ${data.longitude}</span></div>
+          `;
         } else {
-          document.getElementById('summary').innerText = "Unable to resolve coordinates for this IP.";
+          log.innerHTML = `<span style="color:var(--accent-red)">UNABLE TO RESOLVE ROUTE FOR SPECIFIED IP.</span>`;
         }
       } catch (err) {
-        document.getElementById('summary').innerText = "Error connecting to backend API.";
+        log.innerHTML = `<span style="color:var(--accent-red)">ERROR CONNECTING TO BACKEND API.</span>`;
       }
     }
   </script>
