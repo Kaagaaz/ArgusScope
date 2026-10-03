@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ArgusScope // Geospatial Intelligence Dashboard</title>
+    <title>ArgusScope // Consensus Engine</title>
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -30,13 +30,87 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             display: flex;
+            flex-direction: column;
             height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Top Navigation Bar */
+        .navbar {
+            height: 60px;
+            background-color: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+        }
+
+        .brand {
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--accent-cyan);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background-color: #1f2937;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .nav-btn.active {
+            background-color: var(--accent-cyan);
+            color: #030712;
+            border-color: var(--accent-cyan);
+        }
+
+        .status-badge {
+            color: var(--accent-green);
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-green);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* Main Workspace Layout */
+        .workspace {
+            display: flex;
+            flex-grow: 1;
+            height: calc(100vh - 60px);
             overflow: hidden;
         }
 
         /* Sidebar Control Panel */
         .sidebar {
             width: 420px;
+            min-width: 420px;
             background-color: var(--panel-bg);
             border-right: 1px solid var(--border-color);
             display: flex;
@@ -45,18 +119,8 @@
             overflow-y: auto;
         }
 
-        .header {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: var(--accent-cyan);
-            margin-bottom: 20px;
-            letter-spacing: 1px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-        }
-
         .section-title {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
             margin-bottom: 8px;
             text-transform: uppercase;
@@ -67,15 +131,19 @@
             margin-bottom: 20px;
         }
 
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+
         input[type="text"] {
-            width: 100%;
+            flex-grow: 1;
             background-color: #030712;
             border: 1px solid var(--border-color);
             color: var(--text-main);
             padding: 10px;
             border-radius: 4px;
             font-size: 0.9rem;
-            margin-bottom: 10px;
         }
 
         input[type="text"]:focus {
@@ -83,36 +151,49 @@
             border-color: var(--accent-cyan);
         }
 
-        button {
-            width: 100%;
-            background-color: var(--accent-green);
+        button.query-btn {
+            background-color: var(--accent-cyan);
             color: #030712;
             border: none;
-            padding: 10px;
+            padding: 0 20px;
             font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
-            transition: opacity 0.2s;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        button:hover {
+        button.query-btn:hover {
             opacity: 0.9;
         }
 
-        /* Telemetry Terminal Output */
-        .terminal {
+        /* Telemetry Breakdown Box */
+        .telemetry-card {
             background-color: #030712;
             border: 1px solid var(--border-color);
             border-radius: 4px;
-            padding: 12px;
-            font-size: 0.75rem;
-            color: var(--accent-cyan);
-            height: 220px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-break: break-all;
+            padding: 15px;
+            font-size: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .telemetry-row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #111827;
+            padding-bottom: 6px;
+        }
+
+        .telemetry-label {
+            color: var(--text-muted);
+        }
+
+        .telemetry-value {
+            color: var(--text-main);
+            text-align: right;
+            font-weight: bold;
         }
 
         /* Map Container */
@@ -121,146 +202,167 @@
             height: 100%;
             background-color: var(--bg-color);
         }
-
-        .helper-text {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-            margin-bottom: 10px;
-        }
     </style>
 </head>
 <body>
 
-    <!-- Control Operations Sidebar -->
-    <div class="sidebar">
-        <div class="header">ArgusScope // RECON ENGINE</div>
-
-        <!-- 01. IP Geolocation Lookup -->
-        <div class="control-group">
-            <div class="section-title">// 01. Standard IP Lookup</div>
-            <input type="text" id="ipInput" placeholder="Enter target IP (e.g., 8.8.8.8)">
-            <button onclick="executeIpSearch()">Execute IP Search</button>
+    <!-- Top Navigation Bar -->
+    <div class="navbar">
+        <div class="brand">
+            <span>ARGUSSCOPE // CONSENSUS ENGINE</span>
         </div>
-
-        <!-- 02. BSSID / Cluster Triangulation -->
-        <div class="control-group">
-            <div class="section-title">// 02. WiGLE BSSID Triangulation</div>
-            <input type="text" id="bssidInput" placeholder="Single BSSID or comma-separated cluster">
-            <div class="helper-text">Tip: Enter 1 MAC for standard lookup, or multiple separated by commas for multi-point cluster fusion.</div>
-            <button onclick="executeBssidSearch()" style="background-color: var(--accent-cyan);">Triangulate Target</button>
-        </div>
-
-        <!-- 03. Telemetry Terminal -->
-        <div class="control-group" style="flex-grow: 1; display: flex; flex-direction: column;">
-            <div class="section-title">// 03. Telemetry Terminal</div>
-            <div id="telemetryOutput" class="terminal">System initialized. Awaiting target acquisition parameters...</div>
+        <div class="nav-controls">
+            <button class="nav-btn" onclick="setMapLayer('dark')">Cyber Dark</button>
+            <button class="nav-btn active" onclick="setMapLayer('satellite')">Satellite</button>
+            <button class="nav-btn" onclick="setMapLayer('topo')">3D Topo</button>
+            <div class="status-badge">Engine Online</div>
         </div>
     </div>
 
-    <!-- Map Canvas -->
-    <div id="map"></div>
+    <!-- Workspace -->
+    <div class="workspace">
+        <!-- Sidebar Control Panel -->
+        <div class="sidebar">
+            <!-- 01. Network Target Intelligence -->
+            <div class="control-group">
+                <div class="section-title">// 01. Network Target Intelligence</div>
+                <div class="input-row">
+                    <input type="text" id="ipInput" value="14.139.214.2">
+                    <button class="query-btn" onclick="executeConsensusSearch()">Query</button>
+                </div>
+            </div>
+
+            <!-- 02. Multi-Source Telemetry -->
+            <div class="control-group" style="flex-grow: 1; display: flex; flex-direction: column;">
+                <div class="section-title">// 02. Multi-Source Telemetry</div>
+                <div class="telemetry-card" id="telemetryCard">
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">TARGET IP</span>
+                        <span class="telemetry-value" id="resIp">14.139.214.2</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">CONFIDENCE</span>
+                        <span class="telemetry-value" id="resConfidence" style="color: var(--accent-green);">MODERATE</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">CITY / COUNTRY</span>
+                        <span class="telemetry-value" id="resLocation">Itanagar, India</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">rDNS HOSTNAME</span>
+                        <span class="telemetry-value" id="resHostname">N/A</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">rDNS CITY HINT</span>
+                        <span class="telemetry-value" id="resHint">None Detected</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">ISP / NETWORK</span>
+                        <span class="telemetry-value" id="resIsp">Manipur Institute of Technology</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">CONSENSUS COORDS</span>
+                        <span class="telemetry-value" id="resCoords">26.33715, 89.37355</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">RADIUS / UNCERTAINTY</span>
+                        <span class="telemetry-value" id="resRadius">~478 km</span>
+                    </div>
+                    <div class="telemetry-row" style="border-bottom: none;">
+                        <span class="telemetry-label">APIS QUERIED</span>
+                        <span class="telemetry-value" id="resApis">2 Providers</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Canvas -->
+        <div id="map"></div>
+    </div>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <script>
-        // Initialize Leaflet Map centered over Global view
-        const map = L.map('map').setView([30.0, 10.0], 3);
+        // Initialize Map centered on initial coordinates
+        const map = L.map('map').setView([26.33715, 89.37355], 9);
 
-        // Add Dark Tactical Map Tiles (Using Fastly CDN to avoid API key blocks)
-        L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            subdomains: 'abcd',
-            attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
-        }).addTo(map);
+        // Map Layers
+        const layers = {
+            satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                maxZoom: 19,
+                attribution: 'Tiles &copy; Esri'
+            }),
+            dark: L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                subdomains: 'abcd',
+                attribution: '&copy; CARTO'
+            }),
+            topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                maxZoom: 17,
+                attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM'
+            })
+        };
+
+        // Set default active layer to Satellite
+        layers.satellite.addTo(map);
+
+        function setMapLayer(type) {
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            Object.values(layers).forEach(l => map.removeLayer(l));
+            layers[type].addTo(map);
+        }
 
         let currentMarker = null;
-        let currentAccuracyCircle = null;
+        let currentCircle = null;
 
-        // Replace with your live Render backend URL
-        const BACKEND_URL = "https://argusscope-backend.onrender.com";
-
-        function renderMapPosition(lat, lon, radiusMeters, titleInfo) {
+        function renderTarget(lat, lon, radiusKm, info) {
             if (currentMarker) map.removeLayer(currentMarker);
-            if (currentAccuracyCircle) map.removeLayer(currentAccuracyCircle);
+            if (currentCircle) map.removeLayer(currentCircle);
 
-            // Drop Precise Coordinate Marker
             currentMarker = L.marker([lat, lon]).addTo(map)
-                .bindPopup(`<b>${titleInfo}</b><br>Lat: ${lat}<br>Lon: ${lon}`).openPopup();
+                .bindPopup(`<b>Target: ${info.ip}</b><br>LAT: ${lat}<br>LNG: ${lon}<br>Uncertainty: ~${radiusKm} km`).openPopup();
 
-            // Draw Dynamic Precision Radius Ring
-            currentAccuracyCircle = L.circle([lat, lon], {
-                radius: radiusMeters,
+            currentCircle = L.circle([lat, lon], {
+                radius: radiusKm * 1000,
                 color: '#06b6d4',
                 fillColor: '#06b6d4',
                 fillOpacity: 0.15
             }).addTo(map);
 
-            map.setView([lat, lon], 16);
+            map.setView([lat, lon], 9);
         }
 
-        async function executeIpSearch() {
+        // Initial default render matching your screenshot
+        renderTarget(26.33715, 89.37355, 478, { ip: "14.139.214.2" });
+
+        const BACKEND_URL = "https://argusscope-backend.onrender.com";
+
+        async function executeConsensusSearch() {
             const ip = document.getElementById("ipInput").value.trim();
             if (!ip) return;
-
-            document.getElementById("telemetryOutput").innerText = `Querying IP telemetry for ${ip}...`;
 
             try {
                 const response = await fetch(`${BACKEND_URL}/api/v1/locate-ip?ip=${encodeURIComponent(ip)}`);
                 const data = await response.json();
 
-                document.getElementById("telemetryOutput").innerText = JSON.stringify(data, null, 2);
-
                 if (data.latitude && data.longitude) {
-                    renderMapPosition(data.latitude, data.longitude, data.accuracy_radius_m || 5000, `IP Target: ${data.ip}`);
+                    document.getElementById("resIp").innerText = data.ip || ip;
+                    document.getElementById("resLocation").innerText = `${data.city || 'Unknown'}, ${data.country || ''}`;
+                    document.getElementById("resIsp").innerText = data.isp || 'N/A';
+                    document.getElementById("resCoords").innerText = `${data.latitude}, ${data.longitude}`;
+                    
+                    const radius = data.accuracy_radius_km || 478;
+                    document.getElementById("resRadius").innerText = `~${radius} km`;
+
+                    renderTarget(data.latitude, data.longitude, radius, data);
                 } else {
-                    alert("IP resolution failed: " + (data.error || "Unknown error"));
+                    alert("Query failed: " + (data.error || "Unknown error"));
                 }
             } catch (err) {
-                document.getElementById("telemetryOutput").innerText = `Critical Network Error: ${err.message}`;
-            }
-        }
-
-        async function executeBssidSearch() {
-            const rawInput = document.getElementById("bssidInput").value.trim();
-            if (!rawInput) return;
-
-            const macList = rawInput.split(',').map(m => m.trim()).filter(m => m.length > 0);
-            
-            let endpoint = "";
-            let options = {};
-
-            if (macList.length > 1) {
-                endpoint = `${BACKEND_URL}/api/v1/triangulate-cluster`;
-                options = {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
-                        scans: macList.map(mac => ({ netid: mac, rssi: -65 })) 
-                    })
-                };
-                document.getElementById("telemetryOutput").innerText = `Computing multi-point sensor fusion across ${macList.length} nodes...`;
-            } else {
-                endpoint = `${BACKEND_URL}/api/v1/locate-bssid?netid=${encodeURIComponent(macList[0])}`;
-                options = { method: "GET" };
-                document.getElementById("telemetryOutput").innerText = `Querying single BSSID telemetry for ${macList[0]}...`;
-            }
-
-            try {
-                const response = await fetch(endpoint, options);
-                const data = await response.json();
-
-                document.getElementById("telemetryOutput").innerText = JSON.stringify(data, null, 2);
-
-                if (data.latitude && data.longitude) {
-                    const label = data.cluster_size ? `Cluster Target (${data.cluster_size} Nodes)` : `BSSID: ${data.bssid}`;
-                    renderMapPosition(data.latitude, data.longitude, data.accuracy_radius_m || 25, label);
-                } else {
-                    alert("Triangulation failed: " + (data.error || "Target not found"));
-                }
-            } catch (err) {
-                document.getElementById("telemetryOutput").innerText = `Critical Network Error: ${err.message}`;
+                console.error("Network Error:", err);
             }
         }
     </script>
