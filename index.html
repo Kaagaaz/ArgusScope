@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ArgusScope // Consensus Engine</title>
+    <title>ArgusScope // OSINT Recon</title>
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -52,14 +52,11 @@
             font-weight: bold;
             color: var(--accent-cyan);
             letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .nav-controls {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
         }
 
@@ -88,6 +85,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            margin-left: 10px;
         }
 
         .status-badge::before {
@@ -99,7 +97,7 @@
             display: inline-block;
         }
 
-        /* Main Workspace Layout */
+        /* Workspace Layout */
         .workspace {
             display: flex;
             flex-grow: 1;
@@ -117,6 +115,7 @@
             flex-direction: column;
             padding: 20px;
             overflow-y: auto;
+            gap: 20px;
         }
 
         .section-title {
@@ -127,10 +126,30 @@
             letter-spacing: 0.5px;
         }
 
-        .control-group {
-            margin-bottom: 20px;
+        /* EXIF Drop Zone */
+        .exif-dropzone {
+            background-color: #030712;
+            border: 1px dashed var(--border-color);
+            border-radius: 4px;
+            padding: 20px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: border-color 0.2s;
         }
 
+        .exif-dropzone:hover {
+            border-color: var(--accent-cyan);
+            color: var(--text-main);
+        }
+
+        .exif-dropzone span {
+            color: var(--accent-cyan);
+            font-weight: bold;
+        }
+
+        /* Network Locator Input Row */
         .input-row {
             display: flex;
             gap: 10px;
@@ -167,8 +186,8 @@
             opacity: 0.9;
         }
 
-        /* Telemetry Breakdown Box */
-        .telemetry-card {
+        /* Intelligence Report Card */
+        .report-card {
             background-color: #030712;
             border: 1px solid var(--border-color);
             border-radius: 4px;
@@ -179,18 +198,18 @@
             gap: 10px;
         }
 
-        .telemetry-row {
+        .report-row {
             display: flex;
             justify-content: space-between;
             border-bottom: 1px solid #111827;
             padding-bottom: 6px;
         }
 
-        .telemetry-label {
+        .report-label {
             color: var(--text-muted);
         }
 
-        .telemetry-value {
+        .report-value {
             color: var(--text-main);
             text-align: right;
             font-weight: bold;
@@ -209,13 +228,13 @@
     <!-- Top Navigation Bar -->
     <div class="navbar">
         <div class="brand">
-            <span>ARGUSSCOPE // CONSENSUS ENGINE</span>
+            <span>ARGUSSCOPE // OSINT RECON</span>
         </div>
         <div class="nav-controls">
             <button class="nav-btn" onclick="setMapLayer('dark')">Cyber Dark</button>
             <button class="nav-btn active" onclick="setMapLayer('satellite')">Satellite</button>
             <button class="nav-btn" onclick="setMapLayer('topo')">3D Topo</button>
-            <div class="status-badge">Engine Online</div>
+            <div class="status-badge">API Online</div>
         </div>
     </div>
 
@@ -223,57 +242,52 @@
     <div class="workspace">
         <!-- Sidebar Control Panel -->
         <div class="sidebar">
-            <!-- 01. Network Target Intelligence -->
+            
+            <!-- 01. Image EXIF Extraction -->
             <div class="control-group">
-                <div class="section-title">// 01. Network Target Intelligence</div>
-                <div class="input-row">
-                    <input type="text" id="ipInput" value="14.139.214.2">
-                    <button class="query-btn" onclick="executeConsensusSearch()">Query</button>
+                <div class="section-title">// 01. Image EXIF Extraction</div>
+                <div class="exif-dropzone" onclick="document.getElementById('fileInput').click()">
+                    Drop Image or <span>Click to Select</span>
+                    <input type="file" id="fileInput" style="display: none;" accept="image/*" onchange="handleImageExif(this)">
                 </div>
             </div>
 
-            <!-- 02. Multi-Source Telemetry -->
+            <!-- 02. Network Locator -->
+            <div class="control-group">
+                <div class="section-title">// 02. Network Locator</div>
+                <div class="input-row">
+                    <input type="text" id="ipInput" placeholder="Enter target IP (e.g., 117.200.0.1)">
+                    <button class="query-btn" onclick="executeReconSearch()">Query</button>
+                </div>
+            </div>
+
+            <!-- 03. Intelligence Report -->
             <div class="control-group" style="flex-grow: 1; display: flex; flex-direction: column;">
-                <div class="section-title">// 02. Multi-Source Telemetry</div>
-                <div class="telemetry-card" id="telemetryCard">
-                    <div class="telemetry-row">
-                        <span class="telemetry-label">TARGET IP</span>
-                        <span class="telemetry-value" id="resIp">14.139.214.2</span>
+                <div class="section-title">// 03. Intelligence Report</div>
+                <div class="report-card">
+                    <div class="report-row">
+                        <span class="report-label">TARGET IP</span>
+                        <span class="report-value" id="resIp">-</span>
                     </div>
-                    <div class="telemetry-row">
-                        <span class="telemetry-label">CONFIDENCE</span>
-                        <span class="telemetry-value" id="resConfidence" style="color: var(--accent-green);">MODERATE</span>
+                    <div class="report-row">
+                        <span class="report-label">CITY</span>
+                        <span class="report-value" id="resCity">-</span>
                     </div>
-                    <div class="telemetry-row">
-                        <span class="telemetry-label">CITY / COUNTRY</span>
-                        <span class="telemetry-value" id="resLocation">Itanagar, India</span>
+                    <div class="report-row">
+                        <span class="report-label">COUNTRY</span>
+                        <span class="report-value" id="resCountry">-</span>
                     </div>
-                    <div class="telemetry-row">
-                        <span class="telemetry-label">rDNS HOSTNAME</span>
-                        <span class="telemetry-value" id="resHostname">N/A</span>
+                    <div class="report-row">
+                        <span class="report-label">PROVIDER</span>
+                        <span class="report-value" id="resProvider">-</span>
                     </div>
-                    <div class="telemetry-row">
-                        <span class="telemetry-label">rDNS CITY HINT</span>
-                        <span class="telemetry-value" id="resHint">None Detected</span>
-                    </div>
-                    <div class="telemetry-row">
-                        <span class="telemetry-label">ISP / NETWORK</span>
-                        <span class="telemetry-value" id="resIsp">Manipur Institute of Technology</span>
-                    </div>
-                    <div class="telemetry-row">
-                        <span class="telemetry-label">CONSENSUS COORDS</span>
-                        <span class="telemetry-value" id="resCoords">26.33715, 89.37355</span>
-                    </div>
-                    <div class="telemetry-row">
-                        <span class="telemetry-label">RADIUS / UNCERTAINTY</span>
-                        <span class="telemetry-value" id="resRadius">~478 km</span>
-                    </div>
-                    <div class="telemetry-row" style="border-bottom: none;">
-                        <span class="telemetry-label">APIS QUERIED</span>
-                        <span class="telemetry-value" id="resApis">2 Providers</span>
+                    <div class="report-row" style="border-bottom: none;">
+                        <span class="report-label">LAT / LNG</span>
+                        <span class="report-value" id="resCoords">-</span>
                     </div>
                 </div>
             </div>
+
         </div>
 
         <!-- Map Canvas -->
@@ -284,8 +298,8 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <script>
-        // Initialize Map centered on initial coordinates
-        const map = L.map('map').setView([26.33715, 89.37355], 9);
+        // Initialize Map
+        const map = L.map('map').setView([20.0, 0.0], 2);
 
         // Map Layers
         const layers = {
@@ -304,7 +318,7 @@
             })
         };
 
-        // Set default active layer to Satellite
+        // Default to Satellite view
         layers.satellite.addTo(map);
 
         function setMapLayer(type) {
@@ -316,33 +330,22 @@
         }
 
         let currentMarker = null;
-        let currentCircle = null;
-
-        function renderTarget(lat, lon, radiusKm, info) {
-            if (currentMarker) map.removeLayer(currentMarker);
-            if (currentCircle) map.removeLayer(currentCircle);
-
-            currentMarker = L.marker([lat, lon]).addTo(map)
-                .bindPopup(`<b>Target: ${info.ip}</b><br>LAT: ${lat}<br>LNG: ${lon}<br>Uncertainty: ~${radiusKm} km`).openPopup();
-
-            currentCircle = L.circle([lat, lon], {
-                radius: radiusKm * 1000,
-                color: '#06b6d4',
-                fillColor: '#06b6d4',
-                fillOpacity: 0.15
-            }).addTo(map);
-
-            map.setView([lat, lon], 9);
-        }
-
-        // Initial default render matching your screenshot
-        renderTarget(26.33715, 89.37355, 478, { ip: "14.139.214.2" });
-
         const BACKEND_URL = "https://argusscope-backend.onrender.com";
 
-        async function executeConsensusSearch() {
+        function renderTarget(lat, lon, info) {
+            if (currentMarker) map.removeLayer(currentMarker);
+
+            currentMarker = L.marker([lat, lon]).addTo(map)
+                .bindPopup(`<b>IP: ${info.ip}</b><br>LAT: ${lat}<br>LNG: ${lon}`).openPopup();
+
+            map.setView([lat, lon], 13);
+        }
+
+        async function executeReconSearch() {
             const ip = document.getElementById("ipInput").value.trim();
             if (!ip) return;
+
+            document.getElementById("resIp").innerText = "Querying...";
 
             try {
                 const response = await fetch(`${BACKEND_URL}/api/v1/locate-ip?ip=${encodeURIComponent(ip)}`);
@@ -350,19 +353,26 @@
 
                 if (data.latitude && data.longitude) {
                     document.getElementById("resIp").innerText = data.ip || ip;
-                    document.getElementById("resLocation").innerText = `${data.city || 'Unknown'}, ${data.country || ''}`;
-                    document.getElementById("resIsp").innerText = data.isp || 'N/A';
+                    document.getElementById("resCity").innerText = data.city || 'Unknown';
+                    document.getElementById("resCountry").innerText = data.country || 'N/A';
+                    document.getElementById("resProvider").innerText = data.isp || 'N/A';
                     document.getElementById("resCoords").innerText = `${data.latitude}, ${data.longitude}`;
-                    
-                    const radius = data.accuracy_radius_km || 478;
-                    document.getElementById("resRadius").innerText = `~${radius} km`;
 
-                    renderTarget(data.latitude, data.longitude, radius, data);
+                    renderTarget(data.latitude, data.longitude, data);
                 } else {
-                    alert("Query failed: " + (data.error || "Unknown error"));
+                    alert("Query failed: " + (data.error || "Target not found"));
+                    document.getElementById("resIp").innerText = "-";
                 }
             } catch (err) {
                 console.error("Network Error:", err);
+                alert("Critical network error connecting to backend.");
+                document.getElementById("resIp").innerText = "Error";
+            }
+        }
+
+        function handleImageExif(input) {
+            if (input.files && input.files[0]) {
+                alert(`Selected image: ${input.files[0].name}. Ready for EXIF parsing integration.`);
             }
         }
     </script>
