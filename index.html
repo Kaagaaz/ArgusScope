@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ARGUSSCOPE // OSINT Recon Dashboard</title>
+  <title>ARGUSSCOPE // Advanced Network Recon</title>
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -49,15 +49,10 @@
       padding: 12px 20px;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .brand { display: flex; align-items: center; gap: 12px; }
 
     .brand-logo {
-      width: 12px;
-      height: 12px;
+      width: 12px; height: 12px;
       background: var(--accent-cyan);
       box-shadow: 0 0 10px var(--accent-cyan);
       border-radius: 2px;
@@ -73,11 +68,7 @@
 
     header h1 span { color: var(--accent-cyan); }
 
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
+    .header-actions { display: flex; align-items: center; gap: 16px; }
 
     .map-switcher {
       display: flex;
@@ -129,8 +120,7 @@
     }
 
     .status-dot {
-      width: 8px;
-      height: 8px;
+      width: 8px; height: 8px;
       border-radius: 50%;
       background: #eab308;
     }
@@ -142,7 +132,7 @@
 
     .dashboard {
       display: grid;
-      grid-template-columns: 380px 1fr;
+      grid-template-columns: 420px 1fr;
       gap: 16px;
       flex: 1;
       min-height: 0;
@@ -213,12 +203,11 @@
 
     .intel-row:last-child { border-bottom: none; }
     .intel-key { color: var(--text-muted); }
-    .intel-val { color: var(--accent-cyan); font-weight: 500; }
+    .intel-val { color: var(--accent-cyan); font-weight: 500; text-align: right; word-break: break-all; }
 
     .map-container {
       position: relative;
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       border-radius: 8px;
       border: 1px solid var(--border-color);
       overflow: hidden;
@@ -245,7 +234,7 @@
   <header>
     <div class="brand">
       <div class="brand-logo"></div>
-      <h1>ARGUS<span>SCOPE</span> // OSINT RECON</h1>
+      <h1>ARGUS<span>SCOPE</span> // CONSENSUS ENGINE</h1>
     </div>
 
     <div class="header-actions">
@@ -268,15 +257,15 @@
 
     <div class="sidebar">
 
-      <div class="section-title">// 01. Network Locator</div>
+      <div class="section-title">// 01. Network Target Intelligence</div>
       <div class="input-group">
-        <input type="text" id="ipInput" placeholder="Enter IP or Domain (e.g. google.com)">
+        <input type="text" id="ipInput" placeholder="Enter IP or Domain (e.g. 8.8.8.8)">
         <button class="btn-action" onclick="lookupIP()">QUERY</button>
       </div>
 
-      <div class="section-title">// 02. Intelligence Report</div>
+      <div class="section-title">// 02. Multi-Source Telemetry</div>
       <div class="intel-terminal" id="intelTerminal">
-        System initialized. Enter an IP or domain name, or click MY GPS to locate your device.
+        Consensus Engine active. Enter an IP or domain to execute multi-database triangulation.
       </div>
 
     </div>
@@ -303,6 +292,7 @@
 
     let activeLayerKey = 'dark';
     let activeMarker = null;
+    let activeRadiusCircle = null;
 
     function switchMapMode(key) {
       if (key === activeLayerKey) return;
@@ -324,27 +314,35 @@
         const res = await fetch(`${API_URL}/`);
         if (res.ok) {
           dot.classList.add('online');
-          text.innerText = "API ONLINE";
+          text.innerText = "ENGINE ONLINE";
         } else {
           text.innerText = "API ERROR";
         }
       } catch (e) {
-        text.innerText = "WAKING BACKEND...";
+        text.innerText = "WAKING ENGINE...";
         setTimeout(checkBackendStatus, 5000);
       }
     }
     checkBackendStatus();
 
-    function plotCoordinates(lat, lng, label) {
-      if (activeMarker) {
-        map.removeLayer(activeMarker);
-        activeMarker = null;
+    function plotCoordinates(lat, lng, label, radiusMeters = 0) {
+      if (activeMarker) map.removeLayer(activeMarker);
+      if (activeRadiusCircle) map.removeLayer(activeRadiusCircle);
+
+      map.flyTo([lat, lng], 11, { duration: 1.2 });
+
+      // Draw dynamic uncertainty radius circle
+      if (radiusMeters > 0) {
+        activeRadiusCircle = L.circle([lat, lng], {
+          color: '#38bdf8',
+          fillColor: '#38bdf8',
+          fillOpacity: 0.15,
+          radius: radiusMeters
+        }).addTo(map);
       }
 
-      map.flyTo([lat, lng], 12, { duration: 1.2 });
-      
       activeMarker = L.marker([lat, lng]).addTo(map)
-        .bindPopup(`<b>${label}</b><br>LAT: ${lat.toFixed(5)}<br>LNG: ${lng.toFixed(5)}`)
+        .bindPopup(`<b>${label}</b><br>LAT: ${lat.toFixed(5)}<br>LNG: ${lng.toFixed(5)}<br>Uncertainty: ~${Math.round(radiusMeters/1000)} km`)
         .openPopup();
     }
 
@@ -361,12 +359,13 @@
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          plotCoordinates(lat, lng, "Device GPS Position");
+          const acc = position.coords.accuracy;
+          plotCoordinates(lat, lng, "Device GPS Position", acc);
           log.innerHTML = `
-            <div class="intel-row"><span class="intel-key">SOURCE</span><span class="intel-val" style="color:var(--accent-green)">DEVICE GPS</span></div>
+            <div class="intel-row"><span class="intel-key">SOURCE</span><span class="intel-val" style="color:var(--accent-green)">HARDWARE GPS</span></div>
             <div class="intel-row"><span class="intel-key">LATITUDE</span><span class="intel-val">${lat.toFixed(5)}</span></div>
             <div class="intel-row"><span class="intel-key">LONGITUDE</span><span class="intel-val">${lng.toFixed(5)}</span></div>
-            <div class="intel-row"><span class="intel-key">ACCURACY</span><span class="intel-val">~${Math.round(position.coords.accuracy)} meters</span></div>
+            <div class="intel-row"><span class="intel-key">ACCURACY</span><span class="intel-val">~${Math.round(acc)} meters</span></div>
           `;
         },
         (error) => {
@@ -380,22 +379,26 @@
       const ipInput = document.getElementById('ipInput');
       const ip = ipInput.value.trim();
       if (!ip) return;
-      
+
       const log = document.getElementById('intelTerminal');
-      log.innerHTML = `Querying target: <br><span style="color:var(--accent-cyan);">${ip}</span>...`;
+      log.innerHTML = `Executing consensus triangulation on: <br><span style="color:var(--accent-cyan);">${ip}</span>...`;
 
       try {
         const res = await fetch(`${API_URL}/api/v1/locate-ip?ip=${encodeURIComponent(ip)}&_t=${Date.now()}`);
         const data = await res.json();
 
         if (data.latitude && data.longitude) {
-          plotCoordinates(parseFloat(data.latitude), parseFloat(data.longitude), `Target: ${ip}`);
+          plotCoordinates(data.latitude, data.longitude, `Target: ${data.ip}`, data.accuracy_radius_m);
           log.innerHTML = `
-            <div class="intel-row"><span class="intel-key">TARGET</span><span class="intel-val">${data.ip}</span></div>
-            <div class="intel-row"><span class="intel-key">CITY</span><span class="intel-val">${data.city || 'N/A'}</span></div>
-            <div class="intel-row"><span class="intel-key">COUNTRY</span><span class="intel-val">${data.country || 'N/A'}</span></div>
-            <div class="intel-row"><span class="intel-key">PROVIDER</span><span class="intel-val">${data.org || 'N/A'}</span></div>
-            <div class="intel-row"><span class="intel-key">LAT / LNG</span><span class="intel-val">${data.latitude}, ${data.longitude}</span></div>
+            <div class="intel-row"><span class="intel-key">TARGET IP</span><span class="intel-val">${data.ip}</span></div>
+            <div class="intel-row"><span class="intel-key">CONFIDENCE</span><span class="intel-val" style="color:var(--accent-green)">${data.confidence}</span></div>
+            <div class="intel-row"><span class="intel-key">CITY / COUNTRY</span><span class="intel-val">${data.city}, ${data.country}</span></div>
+            <div class="intel-row"><span class="intel-key">rDNS HOSTNAME</span><span class="intel-val">${data.hostname}</span></div>
+            <div class="intel-row"><span class="intel-key">rDNS CITY HINT</span><span class="intel-val">${data.rdns_city_hint}</span></div>
+            <div class="intel-row"><span class="intel-key">ISP / NETWORK</span><span class="intel-val">${data.org}</span></div>
+            <div class="intel-row"><span class="intel-key">CONSENSUS COORDS</span><span class="intel-val">${data.latitude}, ${data.longitude}</span></div>
+            <div class="intel-row"><span class="intel-key">RADIUS / UNCERTAINTY</span><span class="intel-val">~${Math.round(data.accuracy_radius_m/1000)} km</span></div>
+            <div class="intel-row"><span class="intel-key">APIS QUERIED</span><span class="intel-val">${data.sources_queried} Providers</span></div>
           `;
         } else {
           log.innerHTML = `<span style="color:var(--accent-red)">UNABLE TO RESOLVE SPECIFIED TARGET.</span>`;
