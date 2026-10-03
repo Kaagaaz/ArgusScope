@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ARGUSSCOPE // WiGLE Recon Engine</title>
+  <title>ArgusScope // WiGLE Recon Engine</title>
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -60,7 +60,7 @@
     header h1 {
       font-family: var(--font-mono);
       font-size: 1.1rem;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
       font-weight: 700;
       color: #fff;
     }
@@ -189,14 +189,23 @@
     }
 
     #map { width: 100%; height: 100%; background: #000; }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .spinner {
+      display: inline-block;
+      animation: spin 1s linear infinite;
+    }
   </style>
 </head>
-<body class="mode-googleSat">
+<body>
 
   <header>
     <div class="brand">
       <div class="brand-logo"></div>
-      <h1>ARGUS<span>SCOPE</span> // WiGLE ENGINE</h1>
+      <h1>ArgusScope <span>// WiGLE ENGINE</span></h1>
     </div>
 
     <div class="header-actions">
@@ -226,7 +235,7 @@
 
       <div class="section-title">// 03. Telemetry Terminal</div>
       <div class="intel-terminal" id="intelTerminal">
-        WiGLE Global Recon Engine ready. Enter an IP or Wi-Fi MAC Address to begin.
+        ArgusScope Global Recon Engine ready. Enter an IP, BSSID, or request Hardware GPS lock.
       </div>
     </div>
 
@@ -285,12 +294,86 @@
         .openPopup();
     }
 
+    async function locateDeviceGPS() {
+      const log = document.getElementById('intelTerminal');
+
+      if (!navigator.geolocation) {
+        log.innerHTML = `<span style="color:var(--accent-red)">ERROR: GEOLOCATION NOT SUPPORTED BY BROWSER.</span>`;
+        return;
+      }
+
+      log.innerHTML = `
+        <div style="color:var(--accent-cyan); display:flex; align-items:center; gap:8px;">
+          <span class="spinner">⚙️</span> ACQUIRING HARDWARE GPS LOCK...
+        </div>
+      `;
+
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const acc = Math.round(pos.coords.accuracy);
+
+          plotCoordinates(lat, lng, "Device Hardware GPS", acc);
+
+          log.innerHTML = `
+            <div style="color:var(--accent-cyan); display:flex; align-items:center; gap:8px;">
+              <span class="spinner">🌐</span> REVERSE GEOCODING LOCATION...
+            </div>
+          `;
+
+          try {
+            const geoRes = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
+            );
+            const geoData = await geoRes.json();
+            const addr = geoData.address || {};
+
+            const city = addr.city || addr.town || addr.village || addr.suburb || "Unknown City";
+            const state = addr.state || addr.region || "Unknown State";
+            const country = addr.country || "Unknown Country";
+
+            log.innerHTML = `
+              <div class="intel-row"><span class="intel-key">SOURCE</span><span class="intel-val" style="color:var(--accent-green)">HARDWARE GPS</span></div>
+              <div class="intel-row"><span class="intel-key">LATITUDE</span><span class="intel-val">${lat.toFixed(5)}</span></div>
+              <div class="intel-row"><span class="intel-key">LONGITUDE</span><span class="intel-val">${lng.toFixed(5)}</span></div>
+              <div class="intel-row"><span class="intel-key">ACCURACY</span><span class="intel-val">±${acc} meters</span></div>
+              <div class="intel-row"><span class="intel-key">CITY</span><span class="intel-val">${city}</span></div>
+              <div class="intel-row"><span class="intel-key">STATE</span><span class="intel-val">${state}</span></div>
+              <div class="intel-row"><span class="intel-key">COUNTRY</span><span class="intel-val">${country}</span></div>
+            `;
+          } catch (err) {
+            log.innerHTML = `
+              <div class="intel-row"><span class="intel-key">SOURCE</span><span class="intel-val" style="color:var(--accent-green)">HARDWARE GPS</span></div>
+              <div class="intel-row"><span class="intel-key">LATITUDE</span><span class="intel-val">${lat.toFixed(5)}</span></div>
+              <div class="intel-row"><span class="intel-key">LONGITUDE</span><span class="intel-val">${lng.toFixed(5)}</span></div>
+              <div class="intel-row"><span class="intel-key">ACCURACY</span><span class="intel-val">±${acc} meters</span></div>
+              <div class="intel-row"><span class="intel-key">REVERSE GEO</span><span class="intel-val" style="color:var(--accent-red)">LOOKUP FAILED</span></div>
+            `;
+          }
+        },
+        (err) => {
+          let errMsg = "GPS POSITION UNAVAILABLE";
+          if (err.code === 1) errMsg = "GPS PERMISSION DENIED BY USER";
+          if (err.code === 2) errMsg = "POSITION UNAVAILABLE (NO SIGNAL)";
+          if (err.code === 3) errMsg = "GPS REQUEST TIMED OUT";
+
+          log.innerHTML = `<span style="color:var(--accent-red)">ERROR: ${errMsg}</span>`;
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+
     async function lookupIP() {
       const ip = document.getElementById('ipInput').value.trim();
       if (!ip) return;
 
       const log = document.getElementById('intelTerminal');
-      log.innerHTML = `Querying IP Target: ${ip}...`;
+      log.innerHTML = `
+        <div style="color:var(--accent-cyan); display:flex; align-items:center; gap:8px;">
+          <span class="spinner">🔍</span> QUERYING IP TARGET: ${ip}...
+        </div>
+      `;
 
       try {
         const res = await fetch(`${API_URL}/api/v1/locate-ip?ip=${encodeURIComponent(ip)}`);
@@ -317,7 +400,11 @@
       if (!bssid) return;
 
       const log = document.getElementById('intelTerminal');
-      log.innerHTML = `Querying WiGLE Registry for BSSID: <br><span style="color:var(--accent-cyan);">${bssid}</span>...`;
+      log.innerHTML = `
+        <div style="color:var(--accent-cyan); display:flex; align-items:center; gap:8px;">
+          <span class="spinner">📡</span> QUERYING WIGLE REGISTRY...
+        </div>
+      `;
 
       try {
         const res = await fetch(`${API_URL}/api/v1/locate-bssid?netid=${encodeURIComponent(bssid)}`);
@@ -339,13 +426,6 @@
       } catch (err) {
         log.innerHTML = `<span style="color:var(--accent-red)">API ERROR. CHECK BACKEND CREDENTIALS.</span>`;
       }
-    }
-
-    function locateDeviceGPS() {
-      if (!navigator.geolocation) return;
-      navigator.geolocation.getCurrentPosition((pos) => {
-        plotCoordinates(pos.coords.latitude, pos.coords.longitude, "Device GPS", pos.coords.accuracy);
-      }, null, { enableHighAccuracy: true });
     }
   </script>
 </body>
