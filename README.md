@@ -6,7 +6,7 @@ It combines IP geolocation, Wi-Fi BSSID lookup, multi-BSSID location fusion, bro
 
 ---
 
-<img width="3200" height="1732" alt="1000067698" src="https://github.com/user-attachments/assets/c5830b74-3127-4aa1-8791-c679e9dc0e07" />
+<img width="2051" height="1734" alt="1000067705" src="https://github.com/user-attachments/assets/aaa1b43e-c5d3-4a58-adee-0a7bda47f234" />
 
 
 
