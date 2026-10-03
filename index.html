@@ -14,6 +14,7 @@
             --panel-bg: #111827;
             --accent-green: #10b981;
             --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
             --text-main: #f3f4f6;
             --text-muted: #9ca3af;
             --border-color: #1f2937;
@@ -23,7 +24,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
@@ -31,54 +32,58 @@
             color: var(--text-main);
             display: flex;
             height: 100vh;
+            width: 100vw;
             overflow: hidden;
         }
 
         /* Sidebar Control Panel */
         .sidebar {
-            width: 420px;
+            width: 450px;
+            min-width: 450px;
             background-color: var(--panel-bg);
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            padding: 24px;
             overflow-y: auto;
+            z-index: 1000;
         }
 
         .header {
-            font-size: 1.1rem;
-            font-weight: bold;
+            font-size: 1.3rem;
+            font-weight: 700;
             color: var(--accent-cyan);
-            margin-bottom: 20px;
-            letter-spacing: 1px;
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
+            padding-bottom: 12px;
         }
 
         .section-title {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            font-weight: 600;
         }
 
         .control-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
-        input[type="text"] {
+        select, input[type="text"] {
             width: 100%;
             background-color: #030712;
             border: 1px solid var(--border-color);
             color: var(--text-main);
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 0.9rem;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.95rem;
             margin-bottom: 10px;
         }
 
-        input[type="text"]:focus {
+        select:focus, input[type="text"]:focus {
             outline: none;
             border-color: var(--accent-cyan);
         }
@@ -88,13 +93,14 @@
             background-color: var(--accent-green);
             color: #030712;
             border: none;
-            padding: 10px;
-            font-weight: bold;
-            border-radius: 4px;
+            padding: 12px;
+            font-weight: 700;
+            border-radius: 6px;
             cursor: pointer;
             transition: opacity 0.2s;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            font-size: 0.9rem;
         }
 
         button:hover {
@@ -105,11 +111,12 @@
         .terminal {
             background-color: #030712;
             border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 12px;
-            font-size: 0.75rem;
+            border-radius: 6px;
+            padding: 14px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.8rem;
             color: var(--accent-cyan);
-            height: 220px;
+            height: 200px;
             overflow-y: auto;
             white-space: pre-wrap;
             word-break: break-all;
@@ -119,14 +126,16 @@
         #map {
             flex-grow: 1;
             height: 100%;
+            width: 100%;
             background-color: var(--bg-color);
+            z-index: 1;
         }
 
         .helper-text {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
-            margin-top: 4px;
             margin-bottom: 10px;
+            line-height: 1.4;
         }
     </style>
 </head>
@@ -136,24 +145,41 @@
     <div class="sidebar">
         <div class="header">ArgusScope // RECON ENGINE</div>
 
-        <!-- 01. IP Geolocation Lookup -->
+        <!-- Map Layer Switcher -->
         <div class="control-group">
-            <div class="section-title">// 01. Standard IP Lookup</div>
+            <div class="section-title">// Map Theme / Style</div>
+            <select id="mapStyleSelect" onchange="switchMapLayer()">
+                <option value="streets">OpenStreetMap Standard</option>
+                <option value="satellite">ESRI World Imagery (Satellite)</option>
+                <option value="topo">OpenTopoMap (Terrain)</option>
+            </select>
+        </div>
+
+        <!-- Hardware GPS Telemetry -->
+        <div class="control-group">
+            <div class="section-title">// Hardware Sensor GPS</div>
+            <button onclick="executeHardwareGPS()" style="background-color: var(--accent-purple); color: #fff;">Acquire Device Hardware GPS</button>
+            <div class="helper-text" style="margin-top: 6px;">Pulls raw geospatial coordinates straight from your device GPS chip.</div>
+        </div>
+
+        <!-- Standard IP Lookup -->
+        <div class="control-group">
+            <div class="section-title">// IP Geolocation</div>
             <input type="text" id="ipInput" placeholder="Enter target IP (e.g., 8.8.8.8)">
             <button onclick="executeIpSearch()">Execute IP Search</button>
         </div>
 
-        <!-- 02. BSSID / Cluster Triangulation -->
+        <!-- WiGLE BSSID Triangulation -->
         <div class="control-group">
-            <div class="section-title">// 02. WiGLE BSSID Triangulation</div>
+            <div class="section-title">// WiGLE BSSID / Cluster Triangulation</div>
             <input type="text" id="bssidInput" placeholder="Single BSSID or comma-separated cluster">
-            <div class="helper-text">Tip: Enter 1 MAC for standard lookup, or multiple separated by commas for multi-point cluster fusion.</div>
+            <div class="helper-text">Single MAC lookup or multi-point comma list for weighted centroid fusion.</div>
             <button onclick="executeBssidSearch()" style="background-color: var(--accent-cyan);">Triangulate Target</button>
         </div>
 
-        <!-- 03. Telemetry Terminal -->
-        <div class="control-group" style="flex-grow: 1; display: flex; flex-direction: column;">
-            <div class="section-title">// 03. Telemetry Terminal</div>
+        <!-- Telemetry Terminal -->
+        <div class="control-group" style="flex-grow: 1; display: flex; flex-direction: column; margin-bottom: 0;">
+            <div class="section-title">// Telemetry Terminal</div>
             <div id="telemetryOutput" class="terminal">System initialized. Awaiting target acquisition parameters...</div>
         </div>
     </div>
@@ -165,38 +191,77 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <script>
-        // Initialize Leaflet Map centered over Europe/Global view
-        const map = L.map('map').setView([30.0, 10.0], 3);
+        // Initialize Leaflet Map
+        const map = L.map('map', { zoomControl: true }).setView([30.0, 10.0], 3);
 
-        // Add Dark Tactical Map Tiles (CartoDB Dark Matter)
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
-        }).addTo(map);
+        // Map Tile Layers (Keyless & Open Access)
+        const tileLayers = {
+            streets: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }),
+            satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: '&copy; Esri' }),
+            topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, attribution: '&copy; OpenTopoMap' })
+        };
+
+        // Default active layer
+        let currentTileLayer = tileLayers.streets.addTo(map);
+
+        function switchMapLayer() {
+            const selectedStyle = document.getElementById("mapStyleSelect").value;
+            map.removeLayer(currentTileLayer);
+            currentTileLayer = tileLayers[selectedStyle].addTo(map);
+        }
 
         let currentMarker = null;
         let currentAccuracyCircle = null;
-
-        // Change this to your live Render backend URL once deployed
-        const BACKEND_URL = "https://argusscope-backend.onrender.com";
+        const BACKEND_URL = "https://argusscope-backend.onrender.com"; // Replace with your live Render backend URL
 
         function renderMapPosition(lat, lon, radiusMeters, titleInfo) {
             if (currentMarker) map.removeLayer(currentMarker);
             if (currentAccuracyCircle) map.removeLayer(currentAccuracyCircle);
 
-            // Drop Precise Coordinate Marker
             currentMarker = L.marker([lat, lon]).addTo(map)
                 .bindPopup(`<b>${titleInfo}</b><br>Lat: ${lat}<br>Lon: ${lon}`).openPopup();
 
-            // Draw Dynamic Precision Radius Ring
             currentAccuracyCircle = L.circle([lat, lon], {
                 radius: radiusMeters,
                 color: '#06b6d4',
                 fillColor: '#06b6d4',
-                fillOpacity: 0.15
+                fillOpacity: 0.2
             }).addTo(map);
 
-            map.setView([lat, lon], 16); // High zoom snap to target
+            map.setView([lat, lon], 16);
+        }
+
+        function executeHardwareGPS() {
+            if (!navigator.geolocation) {
+                alert("Geolocation hardware is not supported by your browser.");
+                return;
+            }
+
+            document.getElementById("telemetryOutput").innerText = "Requesting hardware GPS telemetry from device sensor...";
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+
+                    const payload = {
+                        source: "Device Hardware GPS Chip",
+                        latitude: lat,
+                        longitude: lon,
+                        accuracy_radius_m: accuracy,
+                        confidence: "Very High (Direct Hardware Telemetry)"
+                    };
+
+                    document.getElementById("telemetryOutput").innerText = JSON.stringify(payload, null, 2);
+                    renderMapPosition(lat, lon, accuracy, "Local Hardware GPS Fix");
+                },
+                (error) => {
+                    alert("Hardware GPS acquisition failed: " + error.message);
+                    document.getElementById("telemetryOutput").innerText = `GPS Error: ${error.message}`;
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
         }
 
         async function executeIpSearch() {
@@ -231,7 +296,6 @@
             let options = {};
 
             if (macList.length > 1) {
-                // Multi-Point Cluster Centroid Payload
                 endpoint = `${BACKEND_URL}/api/v1/triangulate-cluster`;
                 options = {
                     method: "POST",
@@ -242,7 +306,6 @@
                 };
                 document.getElementById("telemetryOutput").innerText = `Computing multi-point sensor fusion across ${macList.length} nodes...`;
             } else {
-                // Single BSSID Lookup Payload
                 endpoint = `${BACKEND_URL}/api/v1/locate-bssid?netid=${encodeURIComponent(macList[0])}`;
                 options = { method: "GET" };
                 document.getElementById("telemetryOutput").innerText = `Querying single BSSID telemetry for ${macList[0]}...`;
