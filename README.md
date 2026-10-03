@@ -1,6 +1,4 @@
-# ArgusScope
-
-### Geospatial Intelligence & OSINT Mapping Platform
+## Geospatial Intelligence & OSINT Mapping Platform
 
 ArgusScope is a web-based geospatial intelligence platform for visualizing publicly available network and geolocation data through an interactive map interface.
 
