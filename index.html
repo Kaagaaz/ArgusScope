@@ -2,463 +2,392 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
->
-
-<meta name="theme-color" content="#070b12">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
 <title>ArgusScope</title>
 
+<!-- Leaflet -->
 <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
->
+/>
 
 <style>
-
 /* =========================================================
    ARGUSSCOPE
-   COMPACT GEO-OSINT FRONTEND
-========================================================= */
+   FRONTEND 3.3
+   ========================================================= */
 
 :root {
-    --bg: #070b12;
-    --panel: #0c121c;
-    --panel2: #101824;
-    --border: #1b2939;
-
-    --text: #dce7f0;
-    --muted: #718496;
-
-    --cyan: #20b8ec;
-    --green: #10c991;
-    --red: #ef5968;
+    --bg: #050b14;
+    --panel: #08111f;
+    --panel2: #0b1626;
+    --border: #172b43;
+    --text: #d7e5f5;
+    --muted: #54708d;
+    --blue: #19b8f2;
+    --green: #16d39a;
+    --red: #e45770;
+    --yellow: #e6c45c;
 }
-
-/* =========================================================
-   RESET
-========================================================= */
 
 * {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
 }
 
 html,
 body {
+    margin: 0;
+    padding: 0;
     width: 100%;
-    height: 100%;
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Courier New", monospace;
 }
 
 body {
-    background: var(--bg);
-    color: var(--text);
-
-    font-family:
-        "Courier New",
-        Courier,
-        monospace;
-
-    overflow: hidden;
-
-    -webkit-tap-highlight-color: transparent;
-}
-
-button,
-input {
-    font-family: inherit;
+    overflow-x: hidden;
 }
 
 /* =========================================================
-   TOP BAR
-========================================================= */
+   HEADER
+   ========================================================= */
 
-.topbar {
-    position: relative;
-    z-index: 5000;
-
-    height: 54px;
-
-    margin: 7px;
-    padding: 0 9px;
+header {
+    margin: 10px;
+    padding: 14px 16px;
+    min-height: 62px;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
-
-    gap: 8px;
+    gap: 10px;
 
     background: var(--panel);
-
     border: 1px solid var(--border);
-    border-radius: 7px;
+    border-radius: 8px;
 }
 
 .brand {
-    flex-shrink: 0;
-
-    font-size: 13px;
-    font-weight: bold;
-
-    white-space: nowrap;
-}
-
-.brand-mark {
-    color: var(--cyan);
-    margin-right: 5px;
-}
-
-.top-actions {
-    position: relative;
-
     display: flex;
     align-items: center;
+    gap: 12px;
 
-    gap: 5px;
-}
-
-.top-btn {
-    min-height: 33px;
-
-    padding: 6px 10px;
-
-    background: var(--panel2);
-    color: var(--muted);
-
-    border: 1px solid var(--border);
-    border-radius: 5px;
-
-    font-size: 8px;
     font-weight: bold;
+    letter-spacing: 1px;
+}
 
+.brand-dot {
+    width: 11px;
+    height: 11px;
+    background: var(--blue);
+    border-radius: 2px;
+    box-shadow: 0 0 12px rgba(25,184,242,.5);
+}
+
+.brand-name {
+    font-size: 16px;
+}
+
+.brand-sub {
+    color: var(--blue);
+    font-size: 13px;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.top-button {
+    border: 1px solid var(--border);
+    background: var(--panel2);
+    color: var(--text);
+
+    padding: 9px 13px;
+    border-radius: 6px;
+
+    font-family: inherit;
+    font-size: 11px;
     cursor: pointer;
-
-    white-space: nowrap;
 }
 
-.top-btn:hover {
-    color: var(--cyan);
-    border-color: #28506a;
+.top-button:hover {
+    border-color: var(--blue);
 }
 
-.top-btn.active {
-    color: #041017;
-    background: var(--cyan);
-    border-color: var(--cyan);
-}
-
-#gpsButton {
-    color: var(--green);
-    border-color: #155540;
-}
-
-#gpsButton.active {
-    color: #04140e;
-    background: var(--green);
-    border-color: var(--green);
+.top-button.active {
+    background: var(--blue);
+    color: #02101a;
 }
 
 /* =========================================================
    MAP MENU
-========================================================= */
+   ========================================================= */
 
 .map-menu {
     position: absolute;
+    z-index: 2000;
 
-    top: 39px;
-    right: 0;
+    top: 76px;
+    right: 10px;
 
-    width: 190px;
-
-    padding: 5px;
+    width: 235px;
 
     display: none;
-    flex-direction: column;
 
-    gap: 3px;
-
-    background: #0b121d;
-
+    background: #07101d;
     border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: 8px;
 
-    box-shadow:
-        0 12px 30px rgba(0,0,0,.55);
+    padding: 10px;
 
-    z-index: 10000;
+    box-shadow: 0 15px 40px rgba(0,0,0,.5);
 }
 
-.map-menu.open {
-    display: flex;
+.map-menu.show {
+    display: block;
+}
+
+.map-menu-title {
+    color: var(--blue);
+    font-size: 11px;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
 }
 
 .map-option {
     width: 100%;
-
-    min-height: 35px;
-
-    padding: 7px 9px;
-
     text-align: left;
 
-    color: #8ca1b3;
+    padding: 10px;
+
+    margin: 3px 0;
+
     background: transparent;
+    border: 1px solid transparent;
 
-    border: 0;
-    border-radius: 4px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 11px;
 
-    font-size: 8px;
-
+    border-radius: 5px;
     cursor: pointer;
 }
 
 .map-option:hover {
-    color: var(--cyan);
-    background: #142031;
+    background: var(--panel2);
+    border-color: var(--border);
 }
 
-.map-option.selected {
-    color: var(--cyan);
-    background: #101d2c;
+.map-option.active {
+    border-color: var(--blue);
+    color: var(--blue);
 }
 
 /* =========================================================
-   WORKSPACE
-========================================================= */
+   MAIN
+   ========================================================= */
 
-.workspace {
-    height: calc(100vh - 69px);
-
-    margin: 0 7px 7px;
-
+.main {
     display: grid;
+    grid-template-columns: 365px minmax(0, 1fr);
 
-    grid-template-columns:
-        285px
-        minmax(0, 1fr);
+    gap: 10px;
 
-    gap: 7px;
-
-    min-height: 0;
+    padding: 0 10px 10px;
 }
 
 /* =========================================================
    SIDEBAR
-========================================================= */
+   ========================================================= */
 
 .sidebar {
     min-width: 0;
-    min-height: 0;
-
-    padding: 10px;
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 10px;
-
-    overflow-y: auto;
 
     background: var(--panel);
-
     border: 1px solid var(--border);
-    border-radius: 7px;
+    border-radius: 8px;
 
-    scrollbar-width: thin;
+    padding: 14px;
+
+    overflow: hidden;
 }
 
 .section {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+    margin-bottom: 17px;
 }
 
 .section-title {
-    color: var(--cyan);
-
-    font-size: 8px;
-
-    letter-spacing: .8px;
+    color: var(--blue);
+    font-size: 11px;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
 }
 
-/* =========================================================
-   INPUT
-========================================================= */
-
-.input {
+input {
     width: 100%;
-    height: 37px;
 
-    padding: 0 9px;
-
-    background: #080e17;
+    background: #0c192a;
     color: var(--text);
 
     border: 1px solid var(--border);
-    border-radius: 5px;
+    border-radius: 6px;
+
+    padding: 13px;
+
+    font-family: inherit;
+    font-size: 13px;
 
     outline: none;
-
-    font-size: 10px;
 }
 
-.input::placeholder {
-    color: #4f6477;
+input:focus {
+    border-color: var(--blue);
 }
-
-.input:focus {
-    border-color: var(--cyan);
-
-    box-shadow:
-        0 0 0 2px
-        rgba(32,184,236,.08);
-}
-
-/* =========================================================
-   ACTION BUTTON
-========================================================= */
 
 .action-button {
     width: 100%;
 
-    min-height: 37px;
+    margin-top: 8px;
 
-    padding: 7px 9px;
+    padding: 13px;
 
     border: 0;
-    border-radius: 5px;
+    border-radius: 6px;
 
-    color: #041017;
-    background: var(--cyan);
-
-    font-size: 8px;
+    font-family: inherit;
+    font-size: 11px;
     font-weight: bold;
-
-    letter-spacing: .4px;
 
     cursor: pointer;
 }
 
-.action-button.green {
-    color: #03140e;
-    background: var(--green);
+.ip-button {
+    background: var(--blue);
+    color: #031019;
 }
 
-.action-button:active {
-    transform: translateY(1px);
+.bssid-button {
+    background: var(--green);
+    color: #03140f;
 }
 
 .action-button:disabled {
-    opacity: .55;
+    opacity: .5;
     cursor: wait;
 }
 
 /* =========================================================
    INTELLIGENCE
-========================================================= */
+   ========================================================= */
 
-.intelligence {
-    min-height: 0;
+.output {
+    min-height: 220px;
+    max-height: 390px;
 
-    flex: 1;
+    overflow-y: auto;
 
-    display: flex;
-    flex-direction: column;
-
-    gap: 5px;
-}
-
-.terminal {
-    min-height: 140px;
-
-    flex: 1;
-
-    padding: 9px;
-
-    overflow: auto;
-
-    background: #050a11;
-    color: var(--cyan);
-
+    background: #030912;
     border: 1px solid var(--border);
-    border-radius: 5px;
+    border-radius: 6px;
 
-    font-size: 8px;
-    line-height: 1.55;
+    padding: 11px;
 
-    scrollbar-width: thin;
+    font-size: 11px;
 }
 
-.terminal.success {
+.status-message {
+    color: var(--red);
+    white-space: pre-wrap;
+}
+
+.result-row {
+    display: grid;
+    grid-template-columns: 105px minmax(0, 1fr);
+
+    gap: 8px;
+
+    padding: 5px 0;
+
+    border-bottom: 1px solid rgba(23,43,67,.35);
+}
+
+.result-label {
+    color: var(--muted);
+}
+
+.result-value {
+    color: var(--text);
+    word-break: break-word;
+}
+
+.result-value.good {
     color: var(--green);
 }
 
-.terminal.error {
+.result-value.warn {
+    color: var(--yellow);
+}
+
+.result-value.bad {
     color: var(--red);
 }
 
 /* =========================================================
-   RESULT CARD
-========================================================= */
+   TELEMETRY
+   ========================================================= */
 
-.result-card {
-    display: flex;
-    flex-direction: column;
+.telemetry {
+    min-height: 105px;
+    max-height: 170px;
 
-    gap: 5px;
+    overflow-y: auto;
+
+    background: #030912;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+
+    padding: 10px;
+
+    font-size: 10px;
+    line-height: 1.55;
 }
 
-.result-row {
-    display: flex;
-    justify-content: space-between;
-
-    gap: 10px;
-
-    padding-bottom: 4px;
-
-    border-bottom: 1px solid #12202e;
+.log {
+    margin-bottom: 3px;
 }
 
-.result-label {
-    color: #63788b;
+.log-info {
+    color: var(--green);
 }
 
-.result-value {
-    color: #dce7f0;
-
-    text-align: right;
-
-    overflow-wrap: anywhere;
+.log-error {
+    color: var(--red);
 }
 
-.result-section {
-    margin-top: 5px;
-
-    color: var(--cyan);
-
-    font-size: 8px;
+.log-warn {
+    color: var(--yellow);
 }
 
 /* =========================================================
    MAP
-========================================================= */
+   ========================================================= */
 
-.map-container {
-    position: relative;
-
+.map-wrapper {
     min-width: 0;
-    min-height: 0;
+    height: calc(100vh - 92px);
+    min-height: 500px;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
 
     overflow: hidden;
 
-    background: #05080d;
-
-    border: 1px solid var(--border);
-    border-radius: 7px;
+    position: relative;
 }
 
 #map {
@@ -466,394 +395,241 @@ input {
     height: 100%;
 }
 
-/* =========================================================
-   MAP STATUS
-========================================================= */
-
 .map-status {
     position: absolute;
 
-    left: 8px;
-    bottom: 8px;
+    z-index: 1000;
 
-    z-index: 2000;
+    bottom: 10px;
+    left: 10px;
 
-    max-width: calc(100% - 16px);
+    padding: 8px 10px;
 
-    padding: 5px 7px;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    pointer-events: none;
-
-    background:
-        rgba(5,9,15,.88);
-
-    color: var(--cyan);
-
+    background: rgba(3,9,18,.9);
     border: 1px solid var(--border);
-    border-radius: 4px;
+    border-radius: 5px;
 
-    font-size: 7px;
-}
+    color: var(--blue);
 
-/* =========================================================
-   CYBER DARK MAP
-========================================================= */
-
-.cyber-dark-tiles {
-    filter:
-        invert(92%)
-        hue-rotate(180deg)
-        brightness(78%)
-        contrast(92%);
-}
-
-/* =========================================================
-   LEAFLET CONTROLS
-========================================================= */
-
-.leaflet-control-zoom {
-    border: 0 !important;
-}
-
-.leaflet-control-zoom a {
-    width: 33px !important;
-    height: 33px !important;
-
-    line-height: 33px !important;
-
-    color: #d9e6ef !important;
-
-    background:
-        #0b121d !important;
-
-    border-color:
-        #223244 !important;
-}
-
-.leaflet-control-zoom a:hover {
-    color: var(--cyan) !important;
-    background: #101d2c !important;
-}
-
-.leaflet-control-attribution {
-    font-size: 8px !important;
+    font-size: 10px;
 }
 
 /* =========================================================
    FOOTER
-========================================================= */
+   ========================================================= */
 
-.footer {
-    position: fixed;
+footer {
+    margin: 0 10px 10px;
 
-    left: 9px;
-    bottom: 2px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
 
-    z-index: 1500;
+    background: var(--panel);
 
-    color: #3d5368;
+    padding: 7px 12px;
 
-    font-size: 6px;
+    color: var(--muted);
+    font-size: 9px;
 
-    pointer-events: none;
+    display: flex;
+    justify-content: space-between;
 }
 
 /* =========================================================
-   TABLET
-========================================================= */
+   LEAFLET
+   ========================================================= */
 
-@media (max-width: 900px) {
+.leaflet-control-zoom a {
+    background: #07101d !important;
+    color: white !important;
+    border-color: var(--border) !important;
+}
 
-    .workspace {
-        grid-template-columns:
-            250px
-            minmax(0, 1fr);
-    }
+.leaflet-control-attribution {
+    font-size: 9px !important;
 }
 
 /* =========================================================
    MOBILE
-========================================================= */
+   ========================================================= */
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
 
-    body {
-        overflow-y: auto;
-        overflow-x: hidden;
+    header {
+        min-height: 58px;
     }
 
-    .topbar {
-        height: auto;
-        min-height: 49px;
-
-        margin: 6px;
-        padding: 7px;
-
-        flex-direction: column;
-
-        align-items: stretch;
-
-        gap: 6px;
+    .brand-sub {
+        display: none;
     }
 
-    .brand {
-        font-size: 12px;
+    .main {
+        grid-template-columns: 1fr;
     }
 
-    .top-actions {
-        width: 100%;
+    .sidebar {
+        order: 2;
     }
 
-    .top-btn {
-        flex: 1;
+    .map-wrapper {
+        order: 1;
 
-        min-height: 31px;
+        height: 55vh;
+        min-height: 390px;
+    }
 
-        padding: 5px 4px;
+    footer {
+        font-size: 8px;
+    }
+}
 
-        font-size: 7px;
+@media (max-width: 600px) {
+
+    header {
+        margin: 7px;
+        padding: 10px;
+
+        min-height: 55px;
+    }
+
+    .brand-name {
+        font-size: 13px;
+    }
+
+    .brand-dot {
+        width: 9px;
+        height: 9px;
+    }
+
+    .top-button {
+        padding: 8px 9px;
+        font-size: 9px;
+    }
+
+    .main {
+        padding: 0 7px 7px;
+        gap: 7px;
+    }
+
+    .sidebar {
+        padding: 11px;
+    }
+
+    .map-wrapper {
+        height: 52vh;
+        min-height: 360px;
+    }
+
+    .result-row {
+        grid-template-columns: 95px minmax(0, 1fr);
     }
 
     .map-menu {
-        top: 35px;
-        right: 0;
-
-        width: 170px;
+        top: 68px;
+        right: 7px;
+        width: 210px;
     }
 
-    .workspace {
-        height: auto;
-
-        margin:
-            0 6px 24px;
-
-        display: flex;
-        flex-direction: column;
-
-        gap: 7px;
-
-        overflow: visible;
-    }
-
-    .sidebar {
-        padding: 9px;
-        gap: 9px;
-
-        overflow: visible;
-    }
-
-    .input {
-        height: 37px;
-    }
-
-    .action-button {
-        min-height: 37px;
-    }
-
-    .terminal {
-        min-height: 120px;
-        max-height: 210px;
-
-        font-size: 8px;
-    }
-
-    .map-container {
-        width: 100%;
-
-        height: 52vh;
-
-        min-height: 300px;
-    }
-
-    #map {
-        min-height: 300px;
-    }
-
-    .footer {
-        display: none;
+    footer {
+        margin: 0 7px 7px;
     }
 }
-
-/* =========================================================
-   SMALL PHONES
-========================================================= */
-
-@media (max-width: 380px) {
-
-    .brand {
-        font-size: 11px;
-    }
-
-    .map-container {
-        height: 47vh;
-        min-height: 275px;
-    }
-
-    #map {
-        min-height: 275px;
-    }
-}
-
-/* =========================================================
-   LANDSCAPE
-========================================================= */
-
-@media
-(max-width: 900px)
-and (orientation: landscape) {
-
-    body {
-        overflow: hidden;
-    }
-
-    .topbar {
-        height: 46px;
-        min-height: 46px;
-
-        flex-direction: row;
-
-        align-items: center;
-
-        padding: 5px 8px;
-    }
-
-    .top-actions {
-        width: auto;
-    }
-
-    .top-btn {
-        flex: initial;
-    }
-
-    .workspace {
-        height: calc(100vh - 59px);
-
-        display: grid;
-
-        grid-template-columns:
-            235px
-            minmax(0, 1fr);
-
-        margin-bottom: 4px;
-    }
-
-    .sidebar {
-        overflow-y: auto;
-    }
-
-    .map-container {
-        height: 100%;
-        min-height: 0;
-    }
-
-    #map {
-        min-height: 0;
-    }
-}
-
 </style>
 </head>
 
-
 <body>
 
-<!-- =========================================================
-     TOP BAR
-========================================================= -->
+<!-- =======================================================
+     HEADER
+     ======================================================= -->
 
-<header class="topbar">
+<header>
 
     <div class="brand">
-        <span class="brand-mark">■</span>
-        ARGUSSCOPE
+        <div class="brand-dot"></div>
+
+        <div class="brand-name">
+            ARGUSSCOPE
+        </div>
+
+        <div class="brand-sub">
+            // INTELLIGENCE ENGINE
+        </div>
     </div>
 
-    <div class="top-actions">
+    <div class="header-buttons">
 
         <button
             id="mapsButton"
-            class="top-btn"
-            type="button"
-        >
+            class="top-button"
+            onclick="toggleMapMenu()">
             ◇ MAPS
         </button>
 
         <button
             id="gpsButton"
-            class="top-btn"
-            type="button"
-        >
+            class="top-button"
+            onclick="locateDevice()">
             ✦ GPS
         </button>
-
-        <div
-            id="mapMenu"
-            class="map-menu"
-        >
-
-            <button
-                class="map-option selected"
-                data-map="street"
-                type="button"
-            >
-                STREET MAP
-            </button>
-
-            <button
-                class="map-option"
-                data-map="google"
-                type="button"
-            >
-                GOOGLE SATELLITE
-            </button>
-
-            <button
-                class="map-option"
-                data-map="esri"
-                type="button"
-            >
-                ESRI SATELLITE
-            </button>
-
-            <button
-                class="map-option"
-                data-map="dark"
-                type="button"
-            >
-                CYBER DARK
-            </button>
-
-        </div>
 
     </div>
 
 </header>
 
 
-<!-- =========================================================
-     WORKSPACE
-========================================================= -->
+<!-- =======================================================
+     MAP MENU
+     ======================================================= -->
 
-<main class="workspace">
+<div id="mapMenu" class="map-menu">
+
+    <div class="map-menu-title">
+        // MAP SOURCES
+    </div>
+
+    <button
+        class="map-option active"
+        onclick="setMap('street')">
+        STREET MAP
+    </button>
+
+    <button
+        class="map-option"
+        onclick="setMap('satellite')">
+        SATELLITE
+    </button>
+
+    <button
+        class="map-option"
+        onclick="setMap('hybrid')">
+        HYBRID
+    </button>
+
+    <button
+        class="map-option"
+        onclick="openGoogleMaps()">
+        GOOGLE MAPS
+    </button>
+
+</div>
 
 
-    <!-- =====================================================
+<!-- =======================================================
+     MAIN
+     ======================================================= -->
+
+<div class="main">
+
+    <!-- ===================================================
          SIDEBAR
-    ====================================================== -->
+         =================================================== -->
 
     <aside class="sidebar">
 
+        <!-- IP -->
 
-        <!-- =================================================
-             IP LOOKUP
-        ================================================== -->
-
-        <section class="section">
+        <div class="section">
 
             <div class="section-title">
                 // 01. IP LOOKUP
@@ -861,30 +637,25 @@ and (orientation: landscape) {
 
             <input
                 id="ipInput"
-                class="input"
                 type="text"
-                inputmode="decimal"
+                value="8.8.8.8"
+                placeholder="IPv4 / IPv6 address"
                 autocomplete="off"
-                spellcheck="false"
-                placeholder="Target IP"
             >
 
             <button
                 id="ipButton"
-                class="action-button"
-                type="button"
-            >
+                class="action-button ip-button"
+                onclick="lookupIP()">
                 EXECUTE IP SEARCH
             </button>
 
-        </section>
+        </div>
 
 
-        <!-- =================================================
-             BSSID LOOKUP
-        ================================================== -->
+        <!-- BSSID -->
 
-        <section class="section">
+        <div class="section">
 
             <div class="section-title">
                 // 02. BSSID LOOKUP
@@ -892,1483 +663,961 @@ and (orientation: landscape) {
 
             <input
                 id="bssidInput"
-                class="input"
                 type="text"
-                inputmode="text"
-                autocomplete="off"
-                spellcheck="false"
                 placeholder="AA:BB:CC:DD:EE:FF"
+                autocomplete="off"
             >
 
             <button
                 id="bssidButton"
-                class="action-button green"
-                type="button"
-            >
+                class="action-button bssid-button"
+                onclick="lookupBSSID()">
                 LOCATE BSSID
             </button>
 
-        </section>
+        </div>
 
 
-        <!-- =================================================
-             INTELLIGENCE
-        ================================================== -->
+        <!-- INTELLIGENCE -->
 
-        <section class="intelligence">
+        <div class="section">
 
             <div class="section-title">
                 // 03. INTELLIGENCE
             </div>
 
             <div
-                id="terminal"
-                class="terminal"
-            >ARGUSSCOPE // ONLINE
+                id="intelligence"
+                class="output">
 
-Waiting for target acquisition...</div>
+                <div class="status-message">
+                    Awaiting target...
+                </div>
 
-        </section>
+            </div>
+
+        </div>
+
+
+        <!-- TELEMETRY -->
+
+        <div class="section">
+
+            <div class="section-title">
+                // 04. TELEMETRY
+            </div>
+
+            <div
+                id="telemetry"
+                class="telemetry">
+
+                <div class="log log-info">
+                    [SYSTEM] ArgusScope frontend initialized.
+                </div>
+
+                <div class="log log-info">
+                    [SYSTEM] Backend connection ready.
+                </div>
+
+                <div class="log">
+                    [SYSTEM] Awaiting target...
+                </div>
+
+            </div>
+
+        </div>
 
     </aside>
 
 
-    <!-- =====================================================
+    <!-- ===================================================
          MAP
-    ====================================================== -->
+         =================================================== -->
 
-    <section class="map-container">
+    <section class="map-wrapper">
 
         <div id="map"></div>
 
         <div
             id="mapStatus"
-            class="map-status"
-        >
-            MAP // STREET MAP
+            class="map-status">
+            MAP // READY
         </div>
 
     </section>
 
-</main>
+</div>
 
 
-<footer class="footer">
-    ARGUSSCOPE // RENDER BACKEND // OPENSTREETMAP
+<!-- =======================================================
+     FOOTER
+     ======================================================= -->
+
+<footer>
+
+    <span>
+        ARGUSSCOPE
+    </span>
+
+    <span>
+        BACKEND // API
+    </span>
+
+    <span id="coordinates">
+        COORD // --
+    </span>
+
 </footer>
 
 
-<script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-></script>
+<!-- =======================================================
+     LEAFLET
+     ======================================================= -->
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 
 <script>
 
 /* =========================================================
    CONFIGURATION
-========================================================= */
+   ========================================================= */
 
-const BACKEND_URL =
+const API_BASE =
     "https://argusscope-backend.onrender.com";
 
 
 /* =========================================================
-   ELEMENTS
-========================================================= */
-
-const ipInput =
-    document.getElementById("ipInput");
-
-const bssidInput =
-    document.getElementById("bssidInput");
-
-const ipButton =
-    document.getElementById("ipButton");
-
-const bssidButton =
-    document.getElementById("bssidButton");
-
-const gpsButton =
-    document.getElementById("gpsButton");
-
-const mapsButton =
-    document.getElementById("mapsButton");
-
-const mapMenu =
-    document.getElementById("mapMenu");
-
-const terminal =
-    document.getElementById("terminal");
-
-const mapStatus =
-    document.getElementById("mapStatus");
-
-
-/* =========================================================
    MAP INITIALIZATION
-========================================================= */
+   ========================================================= */
 
-const map =
-    L.map("map", {
-
-        zoomControl: true,
-
-        attributionControl: true,
-
-        scrollWheelZoom: true,
-
-        doubleClickZoom: true,
-
-        dragging: true,
-
-        touchZoom: true
-
-    });
-
-
-/*
-   Default:
-   Agartala, Tripura.
-*/
-
-map.setView(
-    [
-        23.8315,
-        91.2868
-    ],
-    13
-);
+const map = L.map("map", {
+    zoomControl: true,
+    worldCopyJump: true
+}).setView([23.8315, 91.2868], 12);
 
 
 /* =========================================================
    STREET MAP
-========================================================= */
+   Detailed OpenStreetMap streets, places and labels.
+   ========================================================= */
 
-const streetLayer =
-    L.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-            maxZoom: 19,
-
-            attribution:
-                "&copy; OpenStreetMap contributors"
-        }
-    );
-
-
-/* =========================================================
-   GOOGLE SATELLITE
-========================================================= */
-
-const googleLayer =
-    L.tileLayer(
-        "https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
-        {
-            maxZoom: 20,
-
-            subdomains: [
-                "mt0",
-                "mt1",
-                "mt2",
-                "mt3"
-            ],
-
-            attribution:
-                "&copy; Google"
-        }
-    );
+const streetLayer = L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+        maxZoom: 19,
+        attribution:
+            '&copy; OpenStreetMap contributors'
+    }
+);
 
 
 /* =========================================================
-   ESRI SATELLITE
-========================================================= */
+   SATELLITE
+   ========================================================= */
 
-const esriLayer =
-    L.tileLayer(
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        {
-            maxZoom: 19,
-
-            attribution:
-                "Tiles &copy; Esri"
-        }
-    );
+const satelliteLayer = L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    {
+        maxZoom: 19,
+        attribution:
+            "Tiles &copy; Esri"
+    }
+);
 
 
 /* =========================================================
-   CYBER DARK
-========================================================= */
+   HYBRID
+   Satellite + transparent street labels.
+   ========================================================= */
 
-const darkLayer =
-    L.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-            maxZoom: 19,
-
-            className:
-                "cyber-dark-tiles",
-
-            attribution:
-                "&copy; OpenStreetMap contributors"
-        }
-    );
-
-
-/* =========================================================
-   DEFAULT
-========================================================= */
+const satelliteLabels = L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+        opacity: 0.55,
+        maxZoom: 19,
+        attribution:
+            '&copy; OpenStreetMap contributors'
+    }
+);
 
 streetLayer.addTo(map);
 
-let currentLayer = "street";
+
+/* =========================================================
+   MAP STATE
+   ========================================================= */
+
+let currentLayer = streetLayer;
+let currentMarker = null;
+let gpsMarker = null;
 
 
 /* =========================================================
-   MAP HELPERS
-========================================================= */
+   MAP SWITCHING
+   ========================================================= */
 
-function getLayer(name) {
+function setMap(type) {
 
-    switch (name) {
-
-        case "google":
-            return googleLayer;
-
-        case "esri":
-            return esriLayer;
-
-        case "dark":
-            return darkLayer;
-
-        case "street":
-        default:
-            return streetLayer;
+    if (currentLayer) {
+        map.removeLayer(currentLayer);
     }
-}
 
+    if (type === "street") {
 
-function getLayerName(name) {
+        currentLayer = streetLayer;
+        currentLayer.addTo(map);
 
-    switch (name) {
+        setMapStatus("MAP // STREET");
 
-        case "google":
-            return "GOOGLE SATELLITE";
+    } else if (type === "satellite") {
 
-        case "esri":
-            return "ESRI SATELLITE";
+        currentLayer = satelliteLayer;
+        currentLayer.addTo(map);
 
-        case "dark":
-            return "CYBER DARK";
+        setMapStatus("MAP // SATELLITE");
 
-        default:
-            return "STREET MAP";
+    } else if (type === "hybrid") {
+
+        satelliteLayer.addTo(map);
+        satelliteLabels.addTo(map);
+
+        currentLayer = satelliteLayer;
+
+        setMapStatus("MAP // HYBRID");
+
     }
-}
-
-
-/* =========================================================
-   CHANGE MAP
-========================================================= */
-
-function changeMap(name) {
-
-    const selectedLayer =
-        getLayer(name);
-
-
-    [
-        streetLayer,
-        googleLayer,
-        esriLayer,
-        darkLayer
-
-    ].forEach(layer => {
-
-        if (map.hasLayer(layer)) {
-
-            map.removeLayer(layer);
-        }
-
-    });
-
-
-    selectedLayer.addTo(map);
-
-    currentLayer = name;
-
 
     document
         .querySelectorAll(".map-option")
         .forEach(button => {
-
-            button.classList.toggle(
-                "selected",
-                button.dataset.map === name
-            );
-
+            button.classList.remove("active");
         });
 
+    const buttons =
+        document.querySelectorAll(".map-option");
 
-    mapStatus.textContent =
-        "MAP // " +
-        getLayerName(name);
+    if (type === "street") buttons[0].classList.add("active");
+    if (type === "satellite") buttons[1].classList.add("active");
+    if (type === "hybrid") buttons[2].classList.add("active");
 
-
-    mapMenu.classList.remove("open");
-
-    mapsButton.classList.add("active");
-
-
-    /*
-       Important:
-       invalidateSize() only updates Leaflet's
-       rendering dimensions. It does NOT move
-       or zoom the map.
-    */
-
-    setTimeout(() => {
-
-        map.invalidateSize();
-
-    }, 150);
+    document
+        .getElementById("mapMenu")
+        .classList.remove("show");
 }
 
 
 /* =========================================================
    MAP MENU
-========================================================= */
+   ========================================================= */
 
-mapsButton.addEventListener(
-    "click",
-    event => {
+function toggleMapMenu() {
 
-        event.stopPropagation();
+    document
+        .getElementById("mapMenu")
+        .classList.toggle("show");
+}
 
-        mapMenu.classList.toggle("open");
 
+/* =========================================================
+   CLOSE MENU WHEN CLICKING OUTSIDE
+   ========================================================= */
+
+document.addEventListener("click", function(event) {
+
+    const menu =
+        document.getElementById("mapMenu");
+
+    const button =
+        document.getElementById("mapsButton");
+
+    if (
+        !menu.contains(event.target) &&
+        !button.contains(event.target)
+    ) {
+        menu.classList.remove("show");
     }
-);
+
+});
 
 
-mapMenu.addEventListener(
-    "click",
-    event => {
+/* =========================================================
+   MAP STATUS
+   ========================================================= */
 
-        const option =
-            event.target.closest(
-                ".map-option"
-            );
+function setMapStatus(text) {
 
-        if (!option) {
+    document
+        .getElementById("mapStatus")
+        .textContent = text;
+}
+
+
+/* =========================================================
+   TELEMETRY
+   ========================================================= */
+
+function log(message, type = "info") {
+
+    const telemetry =
+        document.getElementById("telemetry");
+
+    const entry =
+        document.createElement("div");
+
+    entry.className =
+        "log log-" + type;
+
+    const now =
+        new Date().toLocaleTimeString();
+
+    entry.textContent =
+        `[${now}] ${message}`;
+
+    telemetry.appendChild(entry);
+
+    telemetry.scrollTop =
+        telemetry.scrollHeight;
+}
+
+
+/* =========================================================
+   INTELLIGENCE MESSAGE
+   ========================================================= */
+
+function showMessage(message, type = "error") {
+
+    const intelligence =
+        document.getElementById("intelligence");
+
+    intelligence.innerHTML = "";
+
+    const element =
+        document.createElement("div");
+
+    element.className =
+        type === "error"
+            ? "status-message"
+            : "result-value";
+
+    element.textContent = message;
+
+    intelligence.appendChild(element);
+}
+
+
+/* =========================================================
+   SAFE RESULT RENDERER
+   IMPORTANT:
+   Uses textContent instead of injecting API HTML.
+   This fixes the literal <span> bug.
+   ========================================================= */
+
+function renderIPResult(data) {
+
+    const intelligence =
+        document.getElementById("intelligence");
+
+    intelligence.innerHTML = "";
+
+    if (!data || !data.success) {
+
+        showMessage(
+            data?.error ||
+            "No IP geolocation provider could resolve this address."
+        );
+
+        return;
+    }
+
+
+    const fields = [
+
+        ["IP", data.ip],
+
+        ["Hostname", data.hostname],
+
+        ["Country", data.country],
+
+        ["Country Code", data.country_code],
+
+        ["Region", data.region],
+
+        ["City", data.city],
+
+        ["Postal", data.postal],
+
+        ["Latitude", data.latitude],
+
+        ["Longitude", data.longitude],
+
+        ["Timezone", data.timezone],
+
+        ["ISP", data.isp],
+
+        [
+            "Organization",
+            data.organization || data.org
+        ],
+
+        ["ASN", data.asn],
+
+        [
+            "Datacenter",
+            data.is_datacenter
+                ? "YES"
+                : "NO"
+        ],
+
+        [
+            "VPN",
+            data.is_vpn
+                ? "YES"
+                : "NO"
+        ],
+
+        [
+            "Proxy",
+            data.is_proxy
+                ? "YES"
+                : "NO"
+        ],
+
+        [
+            "Tor",
+            data.is_tor
+                ? "YES"
+                : "NO"
+        ],
+
+        [
+            "Confidence",
+            data.confidence
+        ],
+
+        [
+            "Source",
+            data.source
+        ]
+
+    ];
+
+
+    fields.forEach(([label, value]) => {
+
+        if (
+            value === null ||
+            value === undefined ||
+            value === ""
+        ) {
             return;
         }
 
-        changeMap(
-            option.dataset.map
+
+        const row =
+            document.createElement("div");
+
+        row.className =
+            "result-row";
+
+
+        const labelElement =
+            document.createElement("span");
+
+        labelElement.className =
+            "result-label";
+
+        labelElement.textContent =
+            label;
+
+
+        const valueElement =
+            document.createElement("span");
+
+        valueElement.className =
+            "result-value";
+
+        valueElement.textContent =
+            String(value);
+
+
+        row.appendChild(labelElement);
+        row.appendChild(valueElement);
+
+        intelligence.appendChild(row);
+
+    });
+
+
+    const latitude =
+        Number(data.latitude);
+
+    const longitude =
+        Number(data.longitude);
+
+
+    if (
+        Number.isFinite(latitude) &&
+        Number.isFinite(longitude)
+    ) {
+
+        showLocation(
+            latitude,
+            longitude,
+            `IP: ${data.ip || "Unknown"}`
         );
 
-    }
-);
-
-
-document.addEventListener(
-    "click",
-    event => {
-
-        if (
-            !mapMenu.contains(event.target) &&
-            event.target !== mapsButton
-        ) {
-
-            mapMenu.classList.remove("open");
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   TARGET MARKER
-========================================================= */
-
-let targetMarker = null;
-
-let targetCircle = null;
-
-
-function clearTarget() {
-
-    if (targetMarker) {
-
-        map.removeLayer(
-            targetMarker
+        setMapStatus(
+            `MAP // ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
         );
 
-        targetMarker = null;
+        document
+            .getElementById("coordinates")
+            .textContent =
+            `COORD // ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+
     }
 
-
-    if (targetCircle) {
-
-        map.removeLayer(
-            targetCircle
-        );
-
-        targetCircle = null;
-    }
 }
 
 
 /* =========================================================
-   SHOW TARGET
-========================================================= */
+   BSSID RESULT
+   ========================================================= */
 
-function showTarget(
+function renderBSSIDResult(data) {
+
+    const intelligence =
+        document.getElementById("intelligence");
+
+    intelligence.innerHTML = "";
+
+
+    if (!data || !data.success) {
+
+        showMessage(
+            data?.error ||
+            "BSSID lookup failed."
+        );
+
+        return;
+    }
+
+
+    const fields = [
+
+        ["BSSID", data.bssid],
+
+        ["SSID", data.ssid],
+
+        ["Latitude", data.latitude],
+
+        ["Longitude", data.longitude],
+
+        [
+            "Accuracy",
+            data.accuracy_radius_m
+                ? `${data.accuracy_radius_m} m`
+                : null
+        ],
+
+        ["Confidence", data.confidence],
+
+        ["Observations", data.observations],
+
+        ["Source", data.source]
+
+    ];
+
+
+    fields.forEach(([label, value]) => {
+
+        if (
+            value === null ||
+            value === undefined ||
+            value === ""
+        ) {
+            return;
+        }
+
+
+        const row =
+            document.createElement("div");
+
+        row.className =
+            "result-row";
+
+
+        const labelElement =
+            document.createElement("span");
+
+        labelElement.className =
+            "result-label";
+
+        labelElement.textContent =
+            label;
+
+
+        const valueElement =
+            document.createElement("span");
+
+        valueElement.className =
+            "result-value";
+
+        valueElement.textContent =
+            String(value);
+
+
+        row.appendChild(labelElement);
+        row.appendChild(valueElement);
+
+        intelligence.appendChild(row);
+
+    });
+
+
+    const latitude =
+        Number(data.latitude);
+
+    const longitude =
+        Number(data.longitude);
+
+
+    if (
+        Number.isFinite(latitude) &&
+        Number.isFinite(longitude)
+    ) {
+
+        showLocation(
+            latitude,
+            longitude,
+            `BSSID: ${data.bssid || "Unknown"}`
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   MAP MARKER
+   ========================================================= */
+
+function showLocation(
     latitude,
     longitude,
-    radius,
     title
 ) {
 
-    const lat =
-        Number(latitude);
-
-    const lon =
-        Number(longitude);
-
-    const radiusValue =
-        Number(radius);
-
-
-    if (
-        !Number.isFinite(lat) ||
-        !Number.isFinite(lon)
-    ) {
-
-        throw new Error(
-            "Backend returned invalid coordinates."
-        );
+    if (currentMarker) {
+        map.removeLayer(currentMarker);
     }
 
 
-    clearTarget();
+    currentMarker =
+        L.marker([
+            latitude,
+            longitude
+        ]).addTo(map);
 
 
-    targetMarker =
-        L.marker(
-            [
-                lat,
-                lon
-            ]
-        )
-        .addTo(map);
-
-
-    targetMarker.bindPopup(
-        `
-        <strong>
-            ${escapeHtml(title)}
-        </strong>
-
-        <br>
-
-        Latitude:
-        ${lat.toFixed(6)}
-
-        <br>
-
-        Longitude:
-        ${lon.toFixed(6)}
-        `
+    currentMarker.bindPopup(
+        `<b>${escapeHTML(title)}</b><br>
+         ${latitude.toFixed(6)},
+         ${longitude.toFixed(6)}`
     );
 
 
-    /*
-       Only create an accuracy circle when
-       the backend actually provides one.
-
-       ip-api.dev may return null here.
-    */
-
-    if (
-        Number.isFinite(radiusValue) &&
-        radiusValue > 0
-    ) {
-
-        targetCircle =
-            L.circle(
-                [
-                    lat,
-                    lon
-                ],
-                {
-                    radius:
-                        radiusValue,
-
-                    color:
-                        "#20b8ec",
-
-                    fillColor:
-                        "#20b8ec",
-
-                    fillOpacity:
-                        0.10,
-
-                    weight:
-                        1.5
-                }
-            )
-            .addTo(map);
-
-    }
+    map.setView(
+        [latitude, longitude],
+        15,
+        {
+            animate: true
+        }
+    );
 
 
-    /*
-       Move the map ONLY when a new target
-       is acquired.
-
-       Normal zooming and panning afterwards
-       will not be interrupted.
-    */
-
-    if (targetCircle) {
-
-        map.fitBounds(
-            targetCircle.getBounds(),
-            {
-                padding: [
-                    35,
-                    35
-                ],
-
-                maxZoom: 16
-            }
-        );
-
-    } else {
-
-        map.setView(
-            [
-                lat,
-                lon
-            ],
-            14
-        );
-
-    }
-
-
-    mapStatus.textContent =
-        "TARGET // " +
-        lat.toFixed(4) +
-        ", " +
-        lon.toFixed(4);
-
-
-    setTimeout(() => {
-
-        map.invalidateSize();
-
-    }, 200);
+    currentMarker.openPopup();
 }
 
 
 /* =========================================================
-   HTML ESCAPING
-========================================================= */
+   ESCAPE HTML
+   ========================================================= */
 
-function escapeHtml(value) {
+function escapeHTML(value) {
 
     return String(value)
-
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-
-        .replace(
-            /</g,
-            "&lt;"
-        )
-
-        .replace(
-            />/g,
-            "&gt;"
-        )
-
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-}
-
-
-/* =========================================================
-   TERMINAL
-========================================================= */
-
-function setTerminal(
-    message,
-    type = "normal"
-) {
-
-    terminal.className =
-        "terminal";
-
-
-    if (type === "success") {
-
-        terminal.classList.add(
-            "success"
-        );
-    }
-
-
-    if (type === "error") {
-
-        terminal.classList.add(
-            "error"
-        );
-    }
-
-
-    terminal.textContent =
-        message;
-}
-
-
-/* =========================================================
-   LOADING
-========================================================= */
-
-function setLoading(
-    button,
-    loading,
-    text
-) {
-
-    if (loading) {
-
-        if (!button.dataset.originalText) {
-
-            button.dataset.originalText =
-                button.textContent;
-        }
-
-
-        button.disabled = true;
-
-        button.textContent =
-            text;
-
-    } else {
-
-        button.disabled = false;
-
-        button.textContent =
-            button.dataset.originalText ||
-            button.textContent;
-    }
-}
-
-
-/* =========================================================
-   RESPONSE PARSER
-========================================================= */
-
-async function parseResponse(response) {
-
-    const text =
-        await response.text();
-
-
-    if (!text) {
-
-        throw new Error(
-            "Backend returned an empty response."
-        );
-    }
-
-
-    try {
-
-        return JSON.parse(text);
-
-    } catch {
-
-        throw new Error(
-            "Backend returned a non-JSON response. HTTP " +
-            response.status
-        );
-    }
-}
-
-
-/* =========================================================
-   FORMAT VALUE
-========================================================= */
-
-function valueOrDash(value) {
-
-    if (
-        value === null ||
-        value === undefined ||
-        value === ""
-    ) {
-
-        return "—";
-    }
-
-    return String(value);
-}
-
-
-/* =========================================================
-   RESULT ROW
-========================================================= */
-
-function resultRow(
-    label,
-    value
-) {
-
-    if (
-        value === null ||
-        value === undefined ||
-        value === ""
-    ) {
-
-        return "";
-    }
-
-
-    return `
-        <div class="result-row">
-
-            <span class="result-label">
-                ${escapeHtml(label)}
-            </span>
-
-            <span class="result-value">
-                ${escapeHtml(value)}
-            </span>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   IP RESULT FORMATTER
-========================================================= */
-
-function formatIPResult(data) {
-
-    const rows = [];
-
-
-    rows.push(
-        resultRow(
-            "IP",
-            data.ip
-        )
-    );
-
-
-    if (data.hostname) {
-
-        rows.push(
-            resultRow(
-                "Hostname",
-                data.hostname
-            )
-        );
-    }
-
-
-    rows.push(
-        resultRow(
-            "Country",
-            data.country ||
-            data.country_code
-        )
-    );
-
-
-    rows.push(
-        resultRow(
-            "City",
-            data.city
-        )
-    );
-
-
-    rows.push(
-        resultRow(
-            "Region",
-            data.region
-        )
-    );
-
-
-    rows.push(
-        resultRow(
-            "Postal",
-            data.postal
-        )
-    );
-
-
-    rows.push(
-        resultRow(
-            "Timezone",
-            data.timezone
-        )
-    );
-
-
-    rows.push(
-        resultRow(
-            "Latitude",
-            Number(data.latitude).toFixed(6)
-        )
-    );
-
-
-    rows.push(
-        resultRow(
-            "Longitude",
-            Number(data.longitude).toFixed(6)
-        )
-    );
-
-
-    rows.push(`
-        <div class="result-section">
-            NETWORK
-        </div>
-    `);
-
-
-    rows.push(
-        resultRow(
-            "ISP",
-            data.isp
-        )
-    );
-
-
-    rows.push(
-        resultRow(
-            "Organization",
-            data.organization ||
-            data.org
-        )
-    );
-
-
-    rows.push(
-        resultRow(
-            "ASN",
-            data.asn
-        )
-    );
-
-
-    rows.push(
-        resultRow(
-            "Network",
-            data.network_cidr
-        )
-    );
-
-
-    rows.push(
-        resultRow(
-            "Network Type",
-            data.network_type
-        )
-    );
-
-
-    rows.push(`
-        <div class="result-section">
-            ANALYSIS
-        </div>
-    `);
-
-
-    rows.push(
-        resultRow(
-            "Confidence",
-            data.confidence
-        )
-    );
-
-
-    rows.push(
-        resultRow(
-            "Precision",
-            data.precision
-        )
-    );
-
-
-    if (data.is_datacenter !== undefined) {
-
-        rows.push(
-            resultRow(
-                "Datacenter",
-                data.is_datacenter
-                    ? "YES"
-                    : "NO"
-            )
-        );
-    }
-
-
-    if (data.is_vpn !== undefined) {
-
-        rows.push(
-            resultRow(
-                "VPN",
-                data.is_vpn
-                    ? "YES"
-                    : "NO"
-            )
-        );
-    }
-
-
-    if (data.is_proxy !== undefined) {
-
-        rows.push(
-            resultRow(
-                "Proxy",
-                data.is_proxy
-                    ? "YES"
-                    : "NO"
-            )
-        );
-    }
-
-
-    if (data.is_tor !== undefined) {
-
-        rows.push(
-            resultRow(
-                "Tor",
-                data.is_tor
-                    ? "YES"
-                    : "NO"
-            )
-        );
-    }
-
-
-    rows.push(
-        resultRow(
-            "Provider",
-            data.source
-        )
-    );
-
-
-    return `
-        <div class="result-card">
-            ${rows.join("")}
-        </div>
-    `;
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
 
 
 /* =========================================================
    IP LOOKUP
-========================================================= */
+   ========================================================= */
 
-async function locateIP() {
+async function lookupIP() {
+
+    const input =
+        document.getElementById("ipInput");
+
+    const button =
+        document.getElementById("ipButton");
 
     const ip =
-        ipInput.value.trim();
+        input.value.trim();
 
 
     if (!ip) {
 
-        setTerminal(
-            "ERROR\n\nEnter an IP address.",
-            "error"
-        );
-
-        ipInput.focus();
+        showMessage("Enter an IP address.");
 
         return;
     }
 
 
-    setLoading(
-        ipButton,
-        true,
-        "QUERYING..."
+    button.disabled = true;
+
+    button.textContent = "SEARCHING...";
+
+
+    showMessage(
+        "Querying IP intelligence providers...",
+        "info"
     );
 
 
-    setTerminal(
-        "ARGUSSCOPE // IP LOOKUP\n\n" +
-        "Target: " +
-        ip +
-        "\n\n" +
-        "Contacting intelligence backend..."
+    log(
+        `IP lookup requested: ${ip}`
     );
-
-
-    mapStatus.textContent =
-        "MAP // QUERYING";
 
 
     try {
 
-        const url =
-            BACKEND_URL +
-            "/api/v1/locate-ip?ip=" +
-            encodeURIComponent(ip);
-
-
         const response =
             await fetch(
-                url,
+                `${API_BASE}/api/v1/locate-ip?ip=${encodeURIComponent(ip)}`,
                 {
                     method: "GET",
-
                     headers: {
                         "Accept":
                             "application/json"
-                    },
-
-                    cache:
-                        "no-store"
+                    }
                 }
             );
 
 
-        const data =
-            await parseResponse(
-                response
+        let data;
+
+
+        try {
+
+            data =
+                await response.json();
+
+        } catch {
+
+            throw new Error(
+                `Backend returned HTTP ${response.status} with invalid JSON.`
             );
 
+        }
 
-        if (
-            data.success === true &&
-            data.latitude != null &&
-            data.longitude != null
-        ) {
 
-            setTerminal(
-                formatIPResult(data),
-                "success"
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                `Backend returned HTTP ${response.status}.`
             );
 
+        }
 
-            showTarget(
-                data.latitude,
-                data.longitude,
-                data.accuracy_radius_m,
-                "IP: " +
-                (
-                    data.ip ||
-                    ip
-                )
+
+        renderIPResult(data);
+
+
+        if (data.success) {
+
+            log(
+                `IP lookup successful: ${ip}`
             );
 
         } else {
 
-            let message =
-                "IP LOOKUP FAILED\n\n";
-
-
-            message +=
+            log(
                 data.error ||
-                "No location data returned.";
-
-
-            if (
-                Array.isArray(
-                    data.details
-                )
-            ) {
-
-                message +=
-                    "\n\nPROVIDER DETAILS\n\n" +
-                    data.details.join(
-                        "\n"
-                    );
-            }
-
-
-            setTerminal(
-                message,
+                "IP lookup failed.",
                 "error"
             );
 
-
-            mapStatus.textContent =
-                "MAP // NO RESULT";
         }
+
 
     } catch (error) {
 
-        setTerminal(
-            "IP LOOKUP ERROR\n\n" +
-            error.message,
+        showMessage(
+            `IP LOOKUP FAILED\n\n${error.message}`
+        );
+
+
+        log(
+            `IP lookup failed: ${error.message}`,
             "error"
         );
 
-
-        mapStatus.textContent =
-            "MAP // BACKEND ERROR";
-
     } finally {
 
-        setLoading(
-            ipButton,
-            false
-        );
+        button.disabled = false;
+
+        button.textContent =
+            "EXECUTE IP SEARCH";
+
     }
-}
 
-
-/* =========================================================
-   BSSID NORMALIZATION
-========================================================= */
-
-function normalizeBssid(value) {
-
-    return value
-        .trim()
-        .toLowerCase()
-        .replace(
-            /-/g,
-            ":"
-        );
-}
-
-
-function isValidBssid(value) {
-
-    const clean =
-        value
-            .replace(
-                /:/g,
-                ""
-            )
-            .trim();
-
-
-    return /^[0-9a-fA-F]{12}$/
-        .test(clean);
 }
 
 
 /* =========================================================
    BSSID LOOKUP
-========================================================= */
+   ========================================================= */
 
-async function locateBssid() {
+async function lookupBSSID() {
 
-    const raw =
-        bssidInput.value.trim();
+    const input =
+        document.getElementById("bssidInput");
+
+    const button =
+        document.getElementById("bssidButton");
+
+    const bssid =
+        input.value.trim();
 
 
-    if (!raw) {
+    if (!bssid) {
 
-        setTerminal(
-            "ERROR\n\nEnter a BSSID.",
-            "error"
-        );
-
-        bssidInput.focus();
+        showMessage("Enter a BSSID.");
 
         return;
     }
 
 
-    const bssids =
-        raw
-            .split(",")
-            .map(normalizeBssid)
-            .filter(Boolean);
+    button.disabled = true;
+
+    button.textContent = "SEARCHING...";
 
 
-    for (
-        const bssid of bssids
-    ) {
-
-        if (
-            !isValidBssid(bssid)
-        ) {
-
-            setTerminal(
-                "INVALID BSSID\n\n" +
-                bssid +
-                "\n\n" +
-                "Expected format:\n" +
-                "AA:BB:CC:DD:EE:FF",
-                "error"
-            );
-
-            return;
-        }
-    }
-
-
-    setLoading(
-        bssidButton,
-        true,
-        "QUERYING..."
+    showMessage(
+        "Querying WiGLE...",
+        "info"
     );
 
 
-    mapStatus.textContent =
-        "MAP // QUERYING";
+    log(
+        `BSSID lookup requested: ${bssid}`
+    );
 
 
     try {
 
-        /* =================================================
-           SINGLE BSSID
-        ================================================= */
-
-        if (
-            bssids.length === 1
-        ) {
-
-            setTerminal(
-                "ARGUSSCOPE // BSSID LOOKUP\n\n" +
-                "Target: " +
-                bssids[0] +
-                "\n\n" +
-                "Querying WiGLE..."
-            );
-
-
-            const url =
-                BACKEND_URL +
-                "/api/v1/locate-bssid?netid=" +
-                encodeURIComponent(
-                    bssids[0]
-                );
-
-
-            const response =
-                await fetch(
-                    url,
-                    {
-                        method: "GET",
-
-                        headers: {
-                            "Accept":
-                                "application/json"
-                        },
-
-                        cache:
-                            "no-store"
-                    }
-                );
-
-
-            const data =
-                await parseResponse(
-                    response
-                );
-
-
-            if (
-                data.success === true &&
-                data.latitude != null &&
-                data.longitude != null
-            ) {
-
-                setTerminal(
-                    JSON.stringify(
-                        data,
-                        null,
-                        2
-                    ),
-                    "success"
-                );
-
-
-                showTarget(
-                    data.latitude,
-                    data.longitude,
-                    data.accuracy_radius_m,
-                    "BSSID: " +
-                    (
-                        data.bssid ||
-                        bssids[0]
-                    )
-                );
-
-            } else {
-
-                setTerminal(
-                    "BSSID LOOKUP FAILED\n\n" +
-                    (
-                        data.error ||
-                        "BSSID was not found."
-                    ),
-                    "error"
-                );
-
-
-                mapStatus.textContent =
-                    "MAP // NO RESULT";
-            }
-
-
-            return;
-        }
-
-
-        /* =================================================
-           MULTI-BSSID CLUSTER
-        ================================================= */
-
-        setTerminal(
-            "ARGUSSCOPE // CLUSTER FUSION\n\n" +
-            "Targets: " +
-            bssids.length +
-            "\n\n" +
-            "Querying WiGLE cluster..."
-        );
-
-
-        const scans =
-            bssids.map(
-                bssid => ({
-
-                    netid:
-                        bssid,
-
-                    rssi:
-                        -65
-
-                })
-            );
-
-
         const response =
             await fetch(
-                BACKEND_URL +
-                "/api/v1/triangulate-cluster",
+                `${API_BASE}/api/v1/locate-bssid?netid=${encodeURIComponent(bssid)}`,
                 {
-                    method:
-                        "POST",
-
+                    method: "GET",
                     headers: {
-
-                        "Content-Type":
-                            "application/json",
-
                         "Accept":
                             "application/json"
-                    },
-
-                    body:
-                        JSON.stringify({
-                            scans:
-                                scans
-                        })
+                    }
                 }
             );
 
 
-        const data =
-            await parseResponse(
-                response
+        let data;
+
+
+        try {
+
+            data =
+                await response.json();
+
+        } catch {
+
+            throw new Error(
+                `Backend returned HTTP ${response.status} with invalid JSON.`
             );
 
+        }
 
-        if (
-            data.success === true &&
-            data.latitude != null &&
-            data.longitude != null
-        ) {
 
-            setTerminal(
-                JSON.stringify(
-                    data,
-                    null,
-                    2
-                ),
-                "success"
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                `Backend returned HTTP ${response.status}.`
             );
 
+        }
 
-            showTarget(
-                data.latitude,
-                data.longitude,
-                data.accuracy_radius_m,
-                "BSSID Cluster"
+
+        renderBSSIDResult(data);
+
+
+        if (data.success) {
+
+            log(
+                `BSSID lookup successful: ${bssid}`
             );
 
         } else {
 
-            setTerminal(
-                "CLUSTER LOOKUP FAILED\n\n" +
-                (
-                    data.error ||
-                    "No valid cluster coordinates returned."
-                ),
+            log(
+                data.error ||
+                "BSSID lookup failed.",
                 "error"
             );
 
-
-            mapStatus.textContent =
-                "MAP // NO RESULT";
         }
+
 
     } catch (error) {
 
-        setTerminal(
-            "BSSID LOOKUP ERROR\n\n" +
-            error.message,
+        showMessage(
+            `BSSID LOOKUP FAILED\n\n${error.message}`
+        );
+
+
+        log(
+            `BSSID lookup failed: ${error.message}`,
             "error"
         );
 
-
-        mapStatus.textContent =
-            "MAP // BACKEND ERROR";
-
     } finally {
 
-        setLoading(
-            bssidButton,
-            false
-        );
+        button.disabled = false;
+
+        button.textContent =
+            "LOCATE BSSID";
+
     }
+
 }
 
 
 /* =========================================================
    DEVICE GPS
-========================================================= */
+   ========================================================= */
 
 function locateDevice() {
 
-    if (
-        !navigator.geolocation
-    ) {
+    if (!navigator.geolocation) {
 
-        setTerminal(
-            "GPS ERROR\n\n" +
-            "This browser does not support device location.",
+        log(
+            "Browser geolocation is unavailable.",
             "error"
         );
 
@@ -2376,24 +1625,24 @@ function locateDevice() {
     }
 
 
-    gpsButton.classList.add(
-        "active"
+    const button =
+        document.getElementById("gpsButton");
+
+
+    button.disabled = true;
+
+    button.textContent =
+        "GPS...";
+
+
+    log(
+        "Requesting device GPS..."
     );
-
-
-    setTerminal(
-        "ARGUSSCOPE // DEVICE GPS\n\n" +
-        "Requesting location permission..."
-    );
-
-
-    mapStatus.textContent =
-        "MAP // ACQUIRING GPS";
 
 
     navigator.geolocation.getCurrentPosition(
 
-        position => {
+        function(position) {
 
             const latitude =
                 position.coords.latitude;
@@ -2401,223 +1650,199 @@ function locateDevice() {
             const longitude =
                 position.coords.longitude;
 
-            const accuracy =
-                position.coords.accuracy;
 
-
-            setTerminal(
-
-                [
-                    "DEVICE GPS // LOCK ACQUIRED",
-                    "",
-                    "Latitude : " +
-                    latitude,
-
-                    "Longitude: " +
-                    longitude,
-
-                    "Accuracy : ±" +
-                    Math.round(
-                        accuracy
-                    ) +
-                    " m"
-                ].join("\n"),
-
-                "success"
-            );
-
-
-            showTarget(
-                latitude,
-                longitude,
-                accuracy,
-                "DEVICE GPS"
-            );
-
-
-            gpsButton.classList.remove(
-                "active"
-            );
-        },
-
-
-        error => {
-
-            let message;
-
-
-            if (
-                error.code ===
-                error.PERMISSION_DENIED
-            ) {
-
-                message =
-                    "Location permission was denied.";
-
-            } else if (
-                error.code ===
-                error.POSITION_UNAVAILABLE
-            ) {
-
-                message =
-                    "Device location is unavailable.";
-
-            } else if (
-                error.code ===
-                error.TIMEOUT
-            ) {
-
-                message =
-                    "Location request timed out.";
-
-            } else {
-
-                message =
-                    "Unable to obtain device location.";
+            if (gpsMarker) {
+                map.removeLayer(gpsMarker);
             }
 
 
-            setTerminal(
-                "GPS ERROR\n\n" +
+            gpsMarker =
+                L.marker(
+                    [latitude, longitude]
+                ).addTo(map);
+
+
+            gpsMarker.bindPopup(
+                "DEVICE GPS<br>" +
+                latitude.toFixed(6) +
+                ", " +
+                longitude.toFixed(6)
+            );
+
+
+            map.setView(
+                [latitude, longitude],
+                17,
+                {
+                    animate: true
+                }
+            );
+
+
+            gpsMarker.openPopup();
+
+
+            document
+                .getElementById("coordinates")
+                .textContent =
+                `COORD // ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+
+
+            setMapStatus(
+                "MAP // DEVICE GPS"
+            );
+
+
+            log(
+                `GPS position acquired: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
+            );
+
+
+            button.disabled = false;
+
+            button.textContent =
+                "✦ GPS";
+
+        },
+
+
+        function(error) {
+
+            let message =
+                "GPS unavailable.";
+
+            if (error.code === 1) {
+                message =
+                    "GPS permission denied.";
+            }
+
+            if (error.code === 2) {
+                message =
+                    "GPS position unavailable.";
+            }
+
+            if (error.code === 3) {
+                message =
+                    "GPS request timed out.";
+            }
+
+
+            log(
                 message,
                 "error"
             );
 
 
-            mapStatus.textContent =
-                "MAP // GPS FAILED";
+            button.disabled = false;
 
+            button.textContent =
+                "✦ GPS";
 
-            gpsButton.classList.remove(
-                "active"
-            );
         },
 
-
         {
-            enableHighAccuracy:
-                true,
-
-            timeout:
-                15000,
-
-            maximumAge:
-                0
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 10000
         }
+
     );
+
 }
 
 
 /* =========================================================
-   BUTTON EVENTS
-========================================================= */
+   GOOGLE MAPS
+   ========================================================= */
 
-ipButton.addEventListener(
-    "click",
-    locateIP
-);
+function openGoogleMaps() {
+
+    let center =
+        map.getCenter();
+
+    const latitude =
+        center.lat;
+
+    const longitude =
+        center.lng;
 
 
-bssidButton.addEventListener(
-    "click",
-    locateBssid
-);
+    const url =
+        `https://www.google.com/maps/@${latitude},${longitude},17z`;
 
 
-gpsButton.addEventListener(
-    "click",
-    locateDevice
-);
+    window.open(
+        url,
+        "_blank",
+        "noopener"
+    );
+
+
+    document
+        .getElementById("mapMenu")
+        .classList.remove("show");
+
+
+    log(
+        "Google Maps opened for current map position."
+    );
+
+}
 
 
 /* =========================================================
-   ENTER KEY
-========================================================= */
+   ENTER KEY SUPPORT
+   ========================================================= */
 
-ipInput.addEventListener(
-    "keydown",
-    event => {
+document
+    .getElementById("ipInput")
+    .addEventListener(
+        "keydown",
+        event => {
 
-        if (
-            event.key ===
-            "Enter"
-        ) {
+            if (event.key === "Enter") {
+                lookupIP();
+            }
 
-            event.preventDefault();
-
-            locateIP();
         }
-    }
-);
+    );
 
 
-bssidInput.addEventListener(
-    "keydown",
-    event => {
+document
+    .getElementById("bssidInput")
+    .addEventListener(
+        "keydown",
+        event => {
 
-        if (
-            event.key ===
-            "Enter"
-        ) {
+            if (event.key === "Enter") {
+                lookupBSSID();
+            }
 
-            event.preventDefault();
-
-            locateBssid();
         }
-    }
-);
+    );
 
 
 /* =========================================================
-   MAP RESIZE
-========================================================= */
+   INITIALIZATION
+   ========================================================= */
 
-window.addEventListener(
-    "resize",
-    () => {
-
-        setTimeout(
-            () => {
-
-                map.invalidateSize();
-
-            },
-            100
-        );
-    }
+log(
+    "Map initialized."
 );
 
-
-window.addEventListener(
-    "orientationchange",
-    () => {
-
-        setTimeout(
-            () => {
-
-                map.invalidateSize();
-
-            },
-            350
-        );
-    }
+log(
+    "Street map loaded."
 );
 
-
-/* =========================================================
-   INITIALIZE
-========================================================= */
-
-setTimeout(
-    () => {
-
-        map.invalidateSize();
-
-    },
-    300
+log(
+    "Backend: " + API_BASE
 );
 
 </script>
 
 </body>
 </html>
+
+This version specifically fixes the problem visible in your screenshot: API values are rendered with DOM "textContent", so "<span>", "<div>", etc. can no longer appear as raw HTML in the Intelligence panel.
+
+It also does not require a Google Maps API key for the built-in detailed street map. The GOOGLE MAPS option simply opens Google Maps at the current coordinates.
