@@ -7,7 +7,7 @@
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- Google Fonts: JetBrains Mono & Inter -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
   <style>
@@ -39,7 +39,6 @@
       overflow: hidden;
     }
 
-    /* Header Bar */
     header {
       display: flex;
       justify-content: space-between;
@@ -80,7 +79,6 @@
       gap: 16px;
     }
 
-    /* Map Switcher Buttons */
     .map-switcher {
       display: flex;
       background: var(--bg-card);
@@ -100,13 +98,24 @@
       padding: 6px 12px;
       border-radius: 4px;
       cursor: pointer;
-      transition: all 0.2s ease;
     }
 
     .map-btn.active {
       background: var(--accent-cyan);
       color: #000;
       box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+    }
+
+    .btn-gps {
+      background: var(--accent-green);
+      color: #000;
+      border: none;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
     }
 
     .system-status {
@@ -117,7 +126,6 @@
       font-size: 0.75rem;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 1px;
     }
 
     .status-dot {
@@ -125,7 +133,6 @@
       height: 8px;
       border-radius: 50%;
       background: #eab308;
-      box-shadow: 0 0 8px #eab308;
     }
 
     .status-dot.online {
@@ -133,7 +140,6 @@
       box-shadow: 0 0 8px var(--accent-green);
     }
 
-    /* Dashboard Grid Layout */
     .dashboard {
       display: grid;
       grid-template-columns: 380px 1fr;
@@ -159,14 +165,6 @@
       color: var(--accent-cyan);
       text-transform: uppercase;
       letter-spacing: 1.5px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .section-title::before {
-      content: '//';
-      color: var(--text-muted);
     }
 
     .drop-zone {
@@ -176,27 +174,13 @@
       padding: 20px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.2s ease;
     }
 
-    .drop-zone:hover {
-      border-color: var(--accent-cyan);
-      background: rgba(56, 189, 248, 0.03);
-    }
-
-    .drop-zone-text {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
+    .drop-zone-text { font-size: 0.85rem; color: var(--text-muted); }
     .drop-zone-text b { color: var(--text-main); }
-
     input[type="file"] { display: none; }
 
-    .input-group {
-      display: flex;
-      gap: 8px;
-    }
+    .input-group { display: flex; gap: 8px; }
 
     input[type="text"] {
       flex: 1;
@@ -209,11 +193,6 @@
       font-size: 0.85rem;
     }
 
-    input[type="text"]:focus {
-      outline: none;
-      border-color: var(--accent-cyan);
-    }
-
     .btn-action {
       background: var(--accent-cyan);
       color: #000;
@@ -222,7 +201,6 @@
       border-radius: 4px;
       font-family: var(--font-mono);
       font-weight: 700;
-      font-size: 0.8rem;
       cursor: pointer;
     }
 
@@ -261,7 +239,6 @@
 
     #map { width: 100%; height: 100%; background: #000; }
 
-    /* Map Mode Filter Overrides */
     .mode-dark .leaflet-tile { filter: brightness(0.7) invert(1) contrast(1.2) hue-rotate(200deg) saturate(0.3); }
     .mode-satellite .leaflet-tile { filter: none !important; }
     .mode-topo .leaflet-tile { filter: contrast(1.1) brightness(0.9); }
@@ -274,14 +251,6 @@
       font-family: var(--font-mono);
       font-size: 0.8rem;
     }
-    .leaflet-popup-tip { background: var(--bg-panel) !important; }
-
-    @media (max-width: 900px) {
-      body { height: auto; overflow: auto; }
-      .dashboard { grid-template-columns: 1fr; height: auto; }
-      .map-container { height: 450px; }
-      .header-actions { flex-direction: column; align-items: flex-end; }
-    }
   </style>
 </head>
 <body class="mode-dark">
@@ -293,7 +262,8 @@
     </div>
 
     <div class="header-actions">
-      <!-- Mode Switcher Controls -->
+      <button class="btn-gps" onclick="locateDeviceGPS()">📍 MY GPS</button>
+
       <div class="map-switcher">
         <button class="map-btn active" id="btnDark" onclick="switchMapMode('dark')">CYBER DARK</button>
         <button class="map-btn" id="btnSat" onclick="switchMapMode('satellite')">SATELLITE</button>
@@ -311,21 +281,21 @@
 
     <div class="sidebar">
 
-      <div class="section-title">01. Image EXIF Extraction</div>
+      <div class="section-title">// 01. Image EXIF Extraction</div>
       <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
         <p class="drop-zone-text" id="fileLabel">Drop image or <b>Click to Select</b></p>
         <input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload(this.files[0])">
       </div>
 
-      <div class="section-title">02. Network Locator</div>
+      <div class="section-title">// 02. Network Locator</div>
       <div class="input-group">
         <input type="text" id="ipInput" placeholder="Enter target IP (e.g. 8.8.8.8)">
         <button class="btn-action" onclick="lookupIP()">QUERY</button>
       </div>
 
-      <div class="section-title">03. Intelligence Report</div>
+      <div class="section-title">// 03. Intelligence Report</div>
       <div class="intel-terminal" id="intelTerminal">
-        System initialized. Select an image or query an IP address to begin telemetry extraction.
+        System initialized. Select an image, query an IP address, or click MY GPS to locate your device.
       </div>
 
     </div>
@@ -341,39 +311,31 @@
   <script>
     const API_URL = "https://argusscope-backend.onrender.com";
 
-    // Define Tile Layers
     const layers = {
       dark: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }),
       satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18 }),
       topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17 })
     };
 
-    // Initialize Map with Dark Mode Layer
     const map = L.map('map', { zoomControl: false, layers: [layers.dark] }).setView([20, 0], 2);
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
     let activeLayerKey = 'dark';
     let activeMarker = null;
 
-    // Switch Map Views
     function switchMapMode(key) {
       if (key === activeLayerKey) return;
-
       map.removeLayer(layers[activeLayerKey]);
       map.addLayer(layers[key]);
       activeLayerKey = key;
-
-      // Update Body Class for CSS Filter effects
       document.body.className = `mode-${key}`;
 
-      // Update Button Highlight State
       document.querySelectorAll('.map-btn').forEach(btn => btn.classList.remove('active'));
       if (key === 'dark') document.getElementById('btnDark').classList.add('active');
       if (key === 'satellite') document.getElementById('btnSat').classList.add('active');
       if (key === 'topo') document.getElementById('btnTopo').classList.add('active');
     }
 
-    // Check API Status on Load
     async function checkBackendStatus() {
       const dot = document.getElementById('statusDot');
       const text = document.getElementById('statusText');
@@ -393,13 +355,47 @@
     checkBackendStatus();
 
     function plotCoordinates(lat, lng, label) {
-      if (activeMarker) map.removeLayer(activeMarker);
+      // Force remove existing marker from map layer
+      if (activeMarker) {
+        map.removeLayer(activeMarker);
+        activeMarker = null;
+      }
 
-      map.flyTo([lat, lng], 13, { duration: 1.5 });
+      // Fly map smoothly to new coordinates
+      map.flyTo([lat, lng], 12, { duration: 1.2 });
       
+      // Create new marker instance
       activeMarker = L.marker([lat, lng]).addTo(map)
         .bindPopup(`<b>${label}</b><br>LAT: ${lat.toFixed(5)}<br>LNG: ${lng.toFixed(5)}`)
         .openPopup();
+    }
+
+    function locateDeviceGPS() {
+      const log = document.getElementById('intelTerminal');
+      log.innerHTML = `Requesting device hardware location...`;
+
+      if (!navigator.geolocation) {
+        log.innerHTML = `<span style="color:var(--accent-red)">GEOLOCATION NOT SUPPORTED.</span>`;
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          plotCoordinates(lat, lng, "Device GPS Position");
+          log.innerHTML = `
+            <div class="intel-row"><span class="intel-key">SOURCE</span><span class="intel-val" style="color:var(--accent-green)">DEVICE GPS</span></div>
+            <div class="intel-row"><span class="intel-key">LATITUDE</span><span class="intel-val">${lat.toFixed(5)}</span></div>
+            <div class="intel-row"><span class="intel-key">LONGITUDE</span><span class="intel-val">${lng.toFixed(5)}</span></div>
+            <div class="intel-row"><span class="intel-key">ACCURACY</span><span class="intel-val">~${Math.round(position.coords.accuracy)} meters</span></div>
+          `;
+        },
+        (error) => {
+          log.innerHTML = `<span style="color:var(--accent-red)">LOCATION ACCESS DENIED.</span>`;
+        },
+        { enableHighAccuracy: true }
+      );
     }
 
     async function handleFileUpload(file) {
@@ -424,7 +420,7 @@
             <div class="intel-row"><span class="intel-key">STATUS</span><span class="intel-val" style="color:var(--accent-green)">COORDINATES RESOLVED</span></div>
           `;
         } else {
-          log.innerHTML = `<span style="color:var(--accent-red)">NO GPS METADATA FOUND IN IMAGE EXIF.</span>`;
+          log.innerHTML = `<span style="color:var(--accent-red)">NO GPS METADATA FOUND IN IMAGE.</span>`;
         }
       } catch (err) {
         log.innerHTML = `<span style="color:var(--accent-red)">ERROR CONNECTING TO BACKEND API.</span>`;
@@ -432,27 +428,29 @@
     }
 
     async function lookupIP() {
-      const ip = document.getElementById('ipInput').value.trim();
+      const ipInput = document.getElementById('ipInput');
+      const ip = ipInput.value.trim();
       if (!ip) return;
       
       const log = document.getElementById('intelTerminal');
-      log.innerHTML = `Querying network routing info for: <br><span style="color:var(--accent-cyan);">${ip}</span>...`;
+      log.innerHTML = `Querying target: <br><span style="color:var(--accent-cyan);">${ip}</span>...`;
 
       try {
-        const res = await fetch(`${API_URL}/api/v1/locate-ip?ip=${ip}`);
+        // Appended timestamp parameter (?_t=...) to prevent browser from returning cached API responses
+        const res = await fetch(`${API_URL}/api/v1/locate-ip?ip=${encodeURIComponent(ip)}&_t=${Date.now()}`);
         const data = await res.json();
 
         if (data.latitude && data.longitude) {
-          plotCoordinates(data.latitude, data.longitude, `IP: ${ip}`);
+          plotCoordinates(parseFloat(data.latitude), parseFloat(data.longitude), `Target: ${ip}`);
           log.innerHTML = `
-            <div class="intel-row"><span class="intel-key">TARGET IP</span><span class="intel-val">${data.ip}</span></div>
+            <div class="intel-row"><span class="intel-key">TARGET</span><span class="intel-val">${data.ip}</span></div>
             <div class="intel-row"><span class="intel-key">CITY</span><span class="intel-val">${data.city || 'N/A'}</span></div>
             <div class="intel-row"><span class="intel-key">COUNTRY</span><span class="intel-val">${data.country || 'N/A'}</span></div>
             <div class="intel-row"><span class="intel-key">PROVIDER</span><span class="intel-val">${data.org || 'N/A'}</span></div>
             <div class="intel-row"><span class="intel-key">LAT / LNG</span><span class="intel-val">${data.latitude}, ${data.longitude}</span></div>
           `;
         } else {
-          log.innerHTML = `<span style="color:var(--accent-red)">UNABLE TO RESOLVE ROUTE FOR SPECIFIED IP.</span>`;
+          log.innerHTML = `<span style="color:var(--accent-red)">UNABLE TO RESOLVE SPECIFIED TARGET.</span>`;
         }
       } catch (err) {
         log.innerHTML = `<span style="color:var(--accent-red)">ERROR CONNECTING TO BACKEND API.</span>`;
