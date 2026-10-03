@@ -1,1852 +1,2590 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>ArgusScope // Intelligence Engine</title>
+    <meta charset="UTF-8">
 
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<style>
-:root {
-    --bg: #070b14;
-    --panel: #0d1422;
-    --panel-2: #111b2d;
-    --border: #1c2a40;
+    <meta
+        name="theme-color"
+        content="#070b12"
+    >
 
-    --cyan: #20b8ec;
-    --green: #10c991;
+    <title>ArgusScope</title>
 
-    --text: #e9f1f8;
-    --muted: #6f8da8;
-    --danger: #ef5363;
+    <!-- Leaflet -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        crossorigin=""
+    >
 
-    --header-height: 64px;
-}
+    <style>
 
-/* =========================
-   RESET
-========================= */
+        /* =====================================================
+           ARGUSSCOPE
+           FRONTEND
+        ===================================================== */
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+        :root {
+            --bg: #070b12;
+            --panel: #0c121c;
+            --panel-2: #101824;
 
-html,
-body {
-    width: 100%;
-    height: 100%;
-}
+            --border: #1b2939;
 
-body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: "Courier New", monospace;
+            --text: #dce7f0;
+            --muted: #6d8194;
 
-    overflow: hidden;
+            --cyan: #20b8ec;
+            --green: #10c991;
+            --red: #ef5968;
 
-    -webkit-tap-highlight-color: transparent;
-}
+            --header-height: 56px;
+        }
 
-/* =========================
-   HEADER
-========================= */
 
-.navbar {
-    height: var(--header-height);
+        /* =====================================================
+           RESET
+        ===================================================== */
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    gap: 12px;
 
-    padding: 0 16px;
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
 
-    background: var(--panel);
 
-    border: 1px solid var(--border);
-    border-radius: 8px;
+        body {
+            background: var(--bg);
 
-    margin: 10px;
+            color: var(--text);
 
-    position: relative;
-    z-index: 2000;
-}
+            font-family:
+                "Courier New",
+                Courier,
+                monospace;
 
-.brand {
-    min-width: 0;
+            overflow: hidden;
 
-    font-size: 17px;
-    font-weight: bold;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    color: var(--text);
 
-    white-space: nowrap;
-}
+        button,
+        input {
+            font-family: inherit;
+        }
 
-.brand span {
-    color: var(--cyan);
-}
 
-.brand::before {
-    content: "■";
-    color: var(--cyan);
-    margin-right: 9px;
-}
+        button {
+            -webkit-user-select: none;
+            user-select: none;
+        }
 
-/* =========================
-   NAV CONTROLS
-========================= */
 
-.nav-controls {
-    display: flex;
-    align-items: center;
+        /* =====================================================
+           HEADER
+        ===================================================== */
 
-    gap: 7px;
+        .topbar {
+            position: relative;
 
-    flex-wrap: wrap;
-    justify-content: flex-end;
-}
+            z-index: 2000;
 
-.nav-btn {
-    border: 1px solid var(--border);
+            height: var(--header-height);
 
-    background: #101a2a;
+            margin: 8px;
 
-    color: var(--muted);
+            padding: 0 10px;
 
-    padding: 9px 12px;
+            display: flex;
 
-    min-height: 38px;
+            align-items: center;
 
-    border-radius: 6px;
+            justify-content: space-between;
 
-    font-family: inherit;
-    font-size: 11px;
-    font-weight: bold;
+            gap: 10px;
 
-    cursor: pointer;
+            background: var(--panel);
 
-    white-space: nowrap;
+            border: 1px solid var(--border);
 
-    transition:
-        background .15s ease,
-        color .15s ease,
-        border-color .15s ease;
-}
+            border-radius: 7px;
+        }
 
-.nav-btn:active {
-    transform: translateY(1px);
-}
 
-.nav-btn.active {
-    background: var(--cyan);
-    color: #031019;
-    border-color: var(--cyan);
-}
+        .brand {
+            flex-shrink: 0;
 
-#gpsBtn {
-    color: #d9fff3;
-    border-color: var(--green);
-}
+            font-size: 14px;
 
-#gpsBtn.active {
-    background: var(--green);
-    color: #03150f;
-}
+            font-weight: bold;
 
-/* =========================
-   MAIN WORKSPACE
-========================= */
+            letter-spacing: .3px;
 
-.workspace {
-    height: calc(100vh - var(--header-height) - 30px);
+            white-space: nowrap;
+        }
 
-    margin: 0 10px 10px;
 
-    display: grid;
+        .brand-mark {
+            color: var(--cyan);
 
-    grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
+            margin-right: 6px;
+        }
 
-    gap: 10px;
 
-    min-height: 0;
-}
+        .brand-sub {
+            color: var(--cyan);
 
-/* =========================
-   SIDEBAR
-========================= */
+            font-size: 10px;
+        }
 
-.sidebar {
-    min-width: 0;
-    min-height: 0;
 
-    background: var(--panel);
+        /* =====================================================
+           HEADER BUTTONS
+        ===================================================== */
 
-    border: 1px solid var(--border);
-    border-radius: 8px;
+        .top-actions {
+            position: relative;
 
-    padding: 15px;
+            display: flex;
 
-    overflow-y: auto;
+            align-items: center;
 
-    display: flex;
-    flex-direction: column;
+            justify-content: flex-end;
 
-    gap: 16px;
+            gap: 5px;
+        }
 
-    scrollbar-width: thin;
-}
 
-.control-group {
-    display: flex;
-    flex-direction: column;
+        .top-btn {
+            min-height: 34px;
 
-    gap: 8px;
-}
+            padding: 6px 9px;
 
-.section-title {
-    color: var(--cyan);
+            background: var(--panel-2);
 
-    font-size: 12px;
+            color: var(--muted);
 
-    letter-spacing: 1px;
+            border: 1px solid var(--border);
 
-    margin-bottom: 2px;
-}
+            border-radius: 5px;
 
-/* =========================
-   INPUTS
-========================= */
+            font-size: 9px;
 
-input[type="text"] {
-    width: 100%;
+            font-weight: bold;
 
-    height: 48px;
+            cursor: pointer;
 
-    padding: 0 13px;
+            white-space: nowrap;
+        }
 
-    background: #0a1220;
 
-    border: 1px solid var(--border);
+        .top-btn:hover {
+            color: var(--cyan);
 
-    border-radius: 6px;
+            border-color: #28506a;
+        }
 
-    color: var(--text);
 
-    font-family: inherit;
+        .top-btn:active {
+            transform: translateY(1px);
+        }
 
-    font-size: 14px;
 
-    outline: none;
+        .top-btn.active {
+            color: #061018;
 
-    -webkit-appearance: none;
-}
+            background: var(--cyan);
 
-input[type="text"]::placeholder {
-    color: #50657d;
-}
+            border-color: var(--cyan);
+        }
 
-input[type="text"]:focus {
-    border-color: var(--cyan);
 
-    box-shadow:
-        0 0 0 2px rgba(32,184,236,.10);
-}
+        #gpsButton {
+            color: var(--green);
 
-/* =========================
-   ACTION BUTTONS
-========================= */
+            border-color: #155540;
+        }
 
-.action-btn {
-    width: 100%;
 
-    min-height: 48px;
+        #gpsButton.active {
+            color: #04140e;
 
-    padding: 10px 12px;
+            background: var(--green);
 
-    border: 0;
+            border-color: var(--green);
+        }
 
-    border-radius: 6px;
 
-    background: var(--cyan);
+        /* =====================================================
+           MAP MENU
+        ===================================================== */
 
-    color: #031019;
+        .map-menu {
+            position: absolute;
 
-    font-family: inherit;
+            top: 40px;
 
-    font-size: 12px;
+            right: 0;
 
-    font-weight: bold;
+            width: 170px;
 
-    letter-spacing: .4px;
+            padding: 5px;
 
-    cursor: pointer;
+            display: none;
 
-    touch-action: manipulation;
-}
+            flex-direction: column;
 
-.action-btn.green {
-    background: var(--green);
-}
+            gap: 3px;
 
-.action-btn:active {
-    transform: translateY(1px);
-    filter: brightness(.9);
-}
+            background: #0b121d;
 
-.action-btn:disabled {
-    opacity: .55;
-    cursor: wait;
-}
+            border: 1px solid var(--border);
 
-/* =========================
-   TELEMETRY
-========================= */
+            border-radius: 6px;
 
-.telemetry-group {
-    min-height: 150px;
+            box-shadow:
+                0 12px 30px rgba(0, 0, 0, .55);
 
-    flex: 1;
+            z-index: 5000;
+        }
 
-    display: flex;
-    flex-direction: column;
 
-    min-width: 0;
-}
+        .map-menu.open {
+            display: flex;
+        }
 
-.terminal {
-    flex: 1;
 
-    min-height: 150px;
+        .map-option {
+            width: 100%;
 
-    background: #050a12;
+            min-height: 35px;
 
-    border: 1px solid var(--border);
+            padding: 7px 9px;
 
-    border-radius: 6px;
+            text-align: left;
 
-    padding: 12px;
+            color: #8ca1b3;
 
-    overflow: auto;
+            background: transparent;
 
-    white-space: pre-wrap;
+            border: 0;
 
-    overflow-wrap: anywhere;
+            border-radius: 4px;
 
-    font-size: 11px;
+            font-size: 9px;
 
-    line-height: 1.55;
+            cursor: pointer;
+        }
 
-    color: var(--cyan);
 
-    scrollbar-width: thin;
-}
+        .map-option:hover {
+            color: var(--cyan);
 
-.terminal.error {
-    color: var(--danger);
-}
+            background: #142031;
+        }
 
-.terminal.success {
-    color: var(--green);
-}
 
-/* =========================
-   MAP
-========================= */
+        .map-option.selected {
+            color: var(--cyan);
 
-.map-wrapper {
-    position: relative;
+            background: #101d2c;
+        }
 
-    min-width: 0;
-    min-height: 0;
 
-    border: 1px solid var(--border);
+        /* =====================================================
+           MAIN
+        ===================================================== */
 
-    border-radius: 8px;
+        .workspace {
+            height:
+                calc(
+                    100vh
+                    - var(--header-height)
+                    - 24px
+                );
 
-    overflow: hidden;
+            margin: 0 8px 8px;
 
-    background: #050a12;
-}
+            display: grid;
 
-#map {
-    width: 100%;
-    height: 100%;
+            grid-template-columns:
+                300px
+                minmax(0, 1fr);
 
-    min-height: 300px;
-}
+            gap: 8px;
 
-/*
-   Keep Leaflet controls visible above
-   application elements.
-*/
+            min-height: 0;
+        }
 
-.leaflet-top,
-.leaflet-bottom {
-    z-index: 900 !important;
-}
 
-.leaflet-control-zoom a {
-    width: 38px !important;
-    height: 38px !important;
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
 
-    line-height: 38px !important;
+        .sidebar {
+            min-width: 0;
 
-    font-size: 20px !important;
-}
+            min-height: 0;
 
-/* =========================
-   MAP STATUS
-========================= */
+            padding: 11px;
 
-.map-status {
-    position: absolute;
+            display: flex;
 
-    left: 12px;
-    bottom: 12px;
+            flex-direction: column;
 
-    z-index: 1000;
+            gap: 11px;
 
-    background: rgba(5,10,18,.88);
+            overflow-y: auto;
 
-    border: 1px solid var(--border);
+            background: var(--panel);
 
-    border-radius: 5px;
+            border: 1px solid var(--border);
 
-    padding: 7px 9px;
+            border-radius: 7px;
 
-    color: var(--cyan);
+            scrollbar-width: thin;
+        }
 
-    font-size: 10px;
 
-    pointer-events: none;
+        .section {
+            display: flex;
 
-    max-width: calc(100% - 24px);
+            flex-direction: column;
 
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
+            gap: 6px;
+        }
 
-/* =========================
-   FOOTER
-========================= */
 
-.footer {
-    position: fixed;
+        .section-title {
+            color: var(--cyan);
 
-    left: 10px;
-    right: 10px;
-    bottom: 7px;
+            font-size: 9px;
 
-    height: 22px;
+            letter-spacing: .8px;
+        }
 
-    display: flex;
-    align-items: center;
 
-    padding: 0 10px;
+        /* =====================================================
+           INPUT
+        ===================================================== */
 
-    color: #38526b;
+        .input {
+            width: 100%;
 
-    font-size: 9px;
+            height: 39px;
 
-    pointer-events: none;
+            padding: 0 10px;
 
-    z-index: 1500;
-}
+            background: #080e17;
 
-/* =========================
-   TABLET
-========================= */
+            color: var(--text);
 
-@media (max-width: 1000px) {
+            border: 1px solid var(--border);
 
-    .workspace {
-        grid-template-columns: 320px minmax(0, 1fr);
-    }
+            border-radius: 5px;
 
-    .nav-btn {
-        padding: 8px 9px;
-        font-size: 10px;
-    }
+            outline: none;
 
-    .brand {
-        font-size: 15px;
-    }
-}
+            font-size: 11px;
+        }
 
-/* =========================
-   MOBILE
-========================= */
 
-@media (max-width: 720px) {
+        .input::placeholder {
+            color: #4f6477;
+        }
 
-    body {
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
 
-    .navbar {
-        height: auto;
+        .input:focus {
+            border-color: var(--cyan);
 
-        min-height: 58px;
+            box-shadow:
+                0 0 0 2px
+                rgba(32, 184, 236, .08);
+        }
 
-        margin: 7px;
 
-        padding: 9px;
+        /* =====================================================
+           ACTION BUTTON
+        ===================================================== */
 
-        align-items: flex-start;
+        .action-button {
+            width: 100%;
 
-        flex-direction: column;
+            min-height: 39px;
 
-        gap: 8px;
-    }
+            padding: 7px 10px;
 
-    .brand {
-        width: 100%;
+            border: 0;
 
-        font-size: 14px;
-    }
+            border-radius: 5px;
 
-    .nav-controls {
-        width: 100%;
+            color: #041017;
 
-        display: grid;
+            background: var(--cyan);
 
-        grid-template-columns: 1fr 1fr;
+            font-size: 9px;
 
-        gap: 6px;
-    }
+            font-weight: bold;
 
-    .nav-btn {
-        width: 100%;
+            letter-spacing: .4px;
 
-        min-height: 42px;
+            cursor: pointer;
+        }
 
-        padding: 8px 5px;
 
-        font-size: 10px;
-    }
+        .action-button.green {
+            color: #03140e;
 
-    .workspace {
-        height: auto;
+            background: var(--green);
+        }
 
-        margin: 0 7px 35px;
 
-        display: flex;
+        .action-button:active {
+            transform: translateY(1px);
+        }
 
-        flex-direction: column;
 
-        gap: 8px;
+        .action-button:disabled {
+            opacity: .55;
 
-        overflow: visible;
-    }
+            cursor: wait;
+        }
 
-    .sidebar {
-        width: 100%;
 
-        max-height: none;
+        /* =====================================================
+           INTELLIGENCE OUTPUT
+        ===================================================== */
 
-        overflow: visible;
+        .intelligence {
+            min-height: 0;
 
-        padding: 12px;
+            flex: 1;
 
-        gap: 14px;
-    }
+            display: flex;
 
-    .control-group {
-        gap: 7px;
-    }
+            flex-direction: column;
 
-    .section-title {
-        font-size: 11px;
-    }
+            gap: 6px;
+        }
 
-    input[type="text"] {
-        height: 50px;
 
-        font-size: 15px;
-    }
+        .terminal {
+            min-height: 120px;
 
-    .action-btn {
-        min-height: 50px;
+            flex: 1;
 
-        font-size: 12px;
-    }
+            padding: 9px;
 
-    .telemetry-group {
-        min-height: 180px;
-    }
+            overflow: auto;
 
-    .terminal {
-        min-height: 180px;
+            white-space: pre-wrap;
 
-        max-height: 280px;
+            overflow-wrap: anywhere;
 
-        font-size: 11px;
-    }
+            background: #050a11;
 
-    .map-wrapper {
-        height: 55vh;
+            color: var(--cyan);
 
-        min-height: 380px;
+            border: 1px solid var(--border);
 
-        width: 100%;
-    }
+            border-radius: 5px;
 
-    #map {
-        height: 100%;
-        min-height: 380px;
-    }
+            font-size: 9px;
 
-    .leaflet-control-zoom {
-        margin-top: 10px !important;
-        margin-left: 10px !important;
-    }
+            line-height: 1.5;
 
-    .leaflet-control-zoom a {
-        width: 42px !important;
-        height: 42px !important;
+            scrollbar-width: thin;
+        }
 
-        line-height: 42px !important;
 
-        font-size: 22px !important;
-    }
+        .terminal.success {
+            color: var(--green);
+        }
 
-    .footer {
-        height: 25px;
 
-        bottom: 2px;
+        .terminal.error {
+            color: var(--red);
+        }
 
-        left: 7px;
-        right: 7px;
 
-        background: rgba(7,11,20,.92);
+        /* =====================================================
+           MAP
+        ===================================================== */
 
-        border-top: 1px solid var(--border);
+        .map-container {
+            position: relative;
 
-        font-size: 8px;
-    }
-}
+            min-width: 0;
 
-/* =========================
-   SMALL PHONES
-========================= */
+            min-height: 0;
 
-@media (max-width: 420px) {
+            overflow: hidden;
 
-    .brand {
-        font-size: 12px;
-    }
+            background: #05080d;
 
-    .nav-btn {
-        font-size: 9px;
-    }
+            border: 1px solid var(--border);
 
-    .sidebar {
-        padding: 10px;
-    }
+            border-radius: 7px;
+        }
 
-    .map-wrapper {
-        min-height: 340px;
-        height: 52vh;
-    }
 
-    #map {
-        min-height: 340px;
-    }
-}
+        #map {
+            width: 100%;
 
-/* =========================
-   LANDSCAPE PHONE
-========================= */
+            height: 100%;
+        }
 
-@media (max-width: 900px) and (orientation: landscape) {
 
-    .navbar {
-        flex-direction: row;
+        /*
+           Cyber Dark works by applying the filter only to
+           the OSM tile layer.
 
-        align-items: center;
+           Markers, circles and Leaflet controls remain normal.
+        */
 
-        height: 55px;
-    }
+        .cyber-dark-tiles {
+            filter:
+                invert(92%)
+                hue-rotate(180deg)
+                brightness(78%)
+                contrast(92%);
+        }
 
-    .nav-controls {
-        width: auto;
 
-        grid-template-columns: none;
+        /* =====================================================
+           MAP STATUS
+        ===================================================== */
 
-        display: flex;
-    }
+        .map-status {
+            position: absolute;
 
-    .workspace {
-        display: grid;
+            left: 9px;
 
-        grid-template-columns: minmax(260px, 330px) minmax(0, 1fr);
+            bottom: 9px;
 
-        height: calc(100vh - 75px);
+            z-index: 1000;
 
-        overflow: hidden;
-    }
+            max-width: calc(100% - 18px);
 
-    .sidebar {
-        overflow-y: auto;
-    }
+            padding: 5px 7px;
 
-    .map-wrapper {
-        height: 100%;
-        min-height: 0;
-    }
+            overflow: hidden;
 
-    #map {
-        min-height: 0;
-    }
+            text-overflow: ellipsis;
 
-    .footer {
-        display: none;
-    }
-}
-</style>
+            white-space: nowrap;
+
+            pointer-events: none;
+
+            background: rgba(5, 9, 15, .88);
+
+            color: var(--cyan);
+
+            border: 1px solid var(--border);
+
+            border-radius: 4px;
+
+            font-size: 8px;
+        }
+
+
+        /* =====================================================
+           LEAFLET
+        ===================================================== */
+
+        .leaflet-control-zoom {
+            border: 0 !important;
+        }
+
+
+        .leaflet-control-zoom a {
+            width: 34px !important;
+
+            height: 34px !important;
+
+            line-height: 34px !important;
+
+            color: #d9e6ef !important;
+
+            background: #0b121d !important;
+
+            border-color: #223244 !important;
+        }
+
+
+        .leaflet-control-zoom a:hover {
+            color: var(--cyan) !important;
+
+            background: #101d2c !important;
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        .footer {
+            position: fixed;
+
+            left: 10px;
+
+            bottom: 3px;
+
+            z-index: 1500;
+
+            color: #3d5368;
+
+            font-size: 7px;
+
+            pointer-events: none;
+        }
+
+
+        /* =====================================================
+           TABLET
+        ===================================================== */
+
+        @media (max-width: 900px) {
+
+            .workspace {
+                grid-template-columns:
+                    260px
+                    minmax(0, 1fr);
+            }
+
+
+            .brand-sub {
+                display: none;
+            }
+
+
+            .top-btn {
+                padding: 6px 7px;
+            }
+
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 700px) {
+
+            body {
+                overflow-y: auto;
+
+                overflow-x: hidden;
+            }
+
+
+            .topbar {
+                height: auto;
+
+                min-height: 50px;
+
+                margin: 6px;
+
+                padding: 7px;
+
+                flex-direction: column;
+
+                align-items: stretch;
+
+                gap: 6px;
+            }
+
+
+            .brand {
+                font-size: 12px;
+            }
+
+
+            .top-actions {
+                width: 100%;
+
+                display: flex;
+
+                gap: 4px;
+            }
+
+
+            .top-btn {
+                flex: 1;
+
+                min-height: 32px;
+
+                padding: 5px 4px;
+
+                font-size: 8px;
+            }
+
+
+            .map-menu {
+                top: 36px;
+
+                right: 0;
+
+                width: 160px;
+            }
+
+
+            .workspace {
+                height: auto;
+
+                margin:
+                    0
+                    6px
+                    28px;
+
+                display: flex;
+
+                flex-direction: column;
+
+                gap: 7px;
+
+                overflow: visible;
+            }
+
+
+            .sidebar {
+                padding: 9px;
+
+                gap: 9px;
+
+                overflow: visible;
+            }
+
+
+            .section {
+                gap: 5px;
+            }
+
+
+            .section-title {
+                font-size: 8px;
+            }
+
+
+            .input {
+                height: 38px;
+
+                font-size: 11px;
+            }
+
+
+            .action-button {
+                min-height: 38px;
+
+                font-size: 9px;
+            }
+
+
+            .intelligence {
+                min-height: 125px;
+            }
+
+
+            .terminal {
+                min-height: 110px;
+
+                max-height: 180px;
+
+                font-size: 8px;
+            }
+
+
+            .map-container {
+                width: 100%;
+
+                height: 48vh;
+
+                min-height: 290px;
+            }
+
+
+            #map {
+                min-height: 290px;
+            }
+
+
+            .footer {
+                left: 7px;
+
+                bottom: 2px;
+
+                font-size: 6px;
+            }
+
+        }
+
+
+        /* =====================================================
+           SMALL PHONE
+        ===================================================== */
+
+        @media (max-width: 380px) {
+
+            .brand {
+                font-size: 11px;
+            }
+
+
+            .top-btn {
+                font-size: 7px;
+            }
+
+
+            .map-container {
+                height: 45vh;
+
+                min-height: 270px;
+            }
+
+
+            #map {
+                min-height: 270px;
+            }
+
+        }
+
+
+        /* =====================================================
+           LANDSCAPE MOBILE
+        ===================================================== */
+
+        @media
+        (max-width: 900px)
+        and (orientation: landscape) {
+
+            body {
+                overflow: hidden;
+            }
+
+
+            .topbar {
+                height: 48px;
+
+                min-height: 48px;
+
+                flex-direction: row;
+
+                align-items: center;
+
+                padding: 5px 8px;
+            }
+
+
+            .top-actions {
+                width: auto;
+            }
+
+
+            .top-btn {
+                flex: initial;
+
+                min-height: 30px;
+            }
+
+
+            .workspace {
+                height:
+                    calc(
+                        100vh
+                        - 62px
+                    );
+
+                display: grid;
+
+                grid-template-columns:
+                    250px
+                    minmax(0, 1fr);
+
+                margin-bottom: 5px;
+            }
+
+
+            .sidebar {
+                overflow-y: auto;
+            }
+
+
+            .map-container {
+                height: 100%;
+
+                min-height: 0;
+            }
+
+
+            #map {
+                min-height: 0;
+            }
+
+
+            .footer {
+                display: none;
+            }
+
+        }
+
+    </style>
+
 </head>
+
 
 <body>
 
-<!-- =========================
-     HEADER
-========================= -->
 
-<header class="navbar">
+    <!-- =====================================================
+         TOP BAR
+    ====================================================== -->
 
-    <div class="brand">
-        ArgusScope <span>// INTELLIGENCE ENGINE</span>
-    </div>
+    <header class="topbar">
 
-    <div class="nav-controls">
+        <div class="brand">
 
-        <button
-            class="nav-btn"
-            id="btnViews"
-            onclick="toggleViews()">
-            ◇ VIEWS
-        </button>
+            <span class="brand-mark">■</span>
 
-        <button
-            class="nav-btn"
-            id="gpsBtn"
-            onclick="triggerHardwareGps()">
-            ✦ DEVICE GPS
-        </button>
+            ARGUSSCOPE
 
-        <button
-            class="nav-btn"
-            id="btnGoogle"
-            onclick="setMapLayer('google')">
-            GOOGLE HD
-        </button>
+            <span class="brand-sub">
+                // INTELLIGENCE ENGINE
+            </span>
 
-        <button
-            class="nav-btn active"
-            id="btnEsri"
-            onclick="setMapLayer('esri')">
-            ESRI SATELLITE
-        </button>
-
-        <button
-            class="nav-btn"
-            id="btnDark"
-            onclick="setMapLayer('dark')">
-            CYBER DARK
-        </button>
-
-    </div>
-
-</header>
-
-
-<!-- =========================
-     WORKSPACE
-========================= -->
-
-<main class="workspace">
-
-    <!-- =====================
-         SIDEBAR
-    ====================== -->
-
-    <aside class="sidebar">
-
-        <!-- IP -->
-
-        <section class="control-group">
-
-            <div class="section-title">
-                // 01. STANDARD IP LOOKUP
-            </div>
-
-            <input
-                id="ipInput"
-                type="text"
-                inputmode="decimal"
-                autocomplete="off"
-                spellcheck="false"
-                placeholder="Enter Target IP (e.g. 8.8.8.8)"
-            >
-
-            <button
-                id="ipButton"
-                class="action-btn"
-                onclick="executeIpSearch()">
-                EXECUTE IP SEARCH
-            </button>
-
-        </section>
-
-
-        <!-- BSSID -->
-
-        <section class="control-group">
-
-            <div class="section-title">
-                // 02. WIGLE BSSID LOOKUP
-            </div>
-
-            <input
-                id="bssidInput"
-                type="text"
-                inputmode="text"
-                autocomplete="off"
-                spellcheck="false"
-                placeholder="AA:BB:CC:DD:EE:FF"
-            >
-
-            <button
-                id="bssidButton"
-                class="action-btn green"
-                onclick="executeBssidSearch()">
-                LOCATE BSSID
-            </button>
-
-        </section>
-
-
-        <!-- TELEMETRY -->
-
-        <section class="telemetry-group">
-
-            <div class="section-title">
-                // 03. INTELLIGENCE
-            </div>
-
-            <div
-                id="telemetryOutput"
-                class="terminal">
-                ArgusScope frontend initialized.
-                Awaiting target acquisition parameters...
-            </div>
-
-        </section>
-
-    </aside>
-
-
-    <!-- =====================
-         MAP
-    ====================== -->
-
-    <section class="map-wrapper">
-
-        <div id="map"></div>
-
-        <div
-            id="mapStatus"
-            class="map-status">
-            MAP // READY
         </div>
 
-    </section>
 
-</main>
+        <div class="top-actions">
 
+            <!-- MAP MENU -->
 
-<footer class="footer">
-    ARGUSSCOPE&nbsp;&nbsp; // &nbsp;&nbsp;BACKEND: RENDER&nbsp;&nbsp; // &nbsp;&nbsp;SOURCE: GITHUB
-</footer>
+            <button
+                id="mapsButton"
+                class="top-btn"
+                type="button"
+            >
+                ◇ MAPS
+            </button>
 
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+            <!-- GPS -->
 
-<script>
+            <button
+                id="gpsButton"
+                class="top-btn"
+                type="button"
+            >
+                ✦ GPS
+            </button>
 
-/* ========================================================
-   CONFIG
-======================================================== */
 
-const BACKEND_URL =
-    "https://argusscope-backend.onrender.com";
+            <!-- MAP MENU -->
 
+            <div
+                id="mapMenu"
+                class="map-menu"
+            >
 
-/* ========================================================
-   MAP
-======================================================== */
+                <button
+                    class="map-option"
+                    data-map="google"
+                    type="button"
+                >
+                    GOOGLE SATELLITE
+                </button>
 
-const map = L.map("map", {
-    zoomControl: true,
-    attributionControl: true,
 
-    // Prevent the map from interfering with page scrolling
-    scrollWheelZoom: true,
-    doubleClickZoom: true,
-    dragging: true,
-    touchZoom: true
-}).setView([23.83, 91.28], 5);
+                <button
+                    class="map-option selected"
+                    data-map="esri"
+                    type="button"
+                >
+                    ESRI SATELLITE
+                </button>
 
 
-/* ========================================================
-   MAP LAYERS
-======================================================== */
+                <button
+                    class="map-option"
+                    data-map="dark"
+                    type="button"
+                >
+                    CYBER DARK
+                </button>
 
-const layers = {
+            </div>
 
-    esri: L.tileLayer(
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        {
-            maxZoom: 19,
-            attribution: "Tiles &copy; Esri"
-        }
-    ),
+        </div>
 
-    google: L.tileLayer(
-        "https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
-        {
-            maxZoom: 20,
-            subdomains: ["mt0", "mt1", "mt2", "mt3"],
-            attribution: "&copy; Google Maps"
-        }
-    ),
+    </header>
 
-    dark: L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-        {
-            maxZoom: 20,
-            subdomains: "abcd",
-            attribution: "&copy; CARTO"
-        }
-    )
-};
 
 
-/* Default */
+    <!-- =====================================================
+         WORKSPACE
+    ====================================================== -->
 
-layers.esri.addTo(map);
+    <main class="workspace">
 
 
-/* ========================================================
-   LAYER SWITCHING
-======================================================== */
+        <!-- =================================================
+             SIDEBAR
+        ================================================== -->
 
-function setMapLayer(type) {
+        <aside class="sidebar">
 
-    Object.values(layers).forEach(layer => {
 
-        if (map.hasLayer(layer)) {
-            map.removeLayer(layer);
-        }
+            <!-- IP -->
 
-    });
+            <section class="section">
 
-    if (layers[type]) {
-        layers[type].addTo(map);
-    }
+                <div class="section-title">
+                    // 01. IP LOOKUP
+                </div>
 
-    document
-        .querySelectorAll(".nav-btn")
-        .forEach(button => {
 
-            button.classList.remove("active");
+                <input
+                    id="ipInput"
+                    class="input"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    spellcheck="false"
+                    placeholder="Target IP"
+                >
 
-        });
 
-    const buttonMap = {
+                <button
+                    id="ipButton"
+                    class="action-button"
+                    type="button"
+                >
+                    EXECUTE IP SEARCH
+                </button>
 
-        google: "btnGoogle",
-        esri: "btnEsri",
-        dark: "btnDark"
+            </section>
 
-    };
 
-    if (buttonMap[type]) {
 
-        document
-            .getElementById(buttonMap[type])
-            .classList.add("active");
+            <!-- BSSID -->
 
-    }
+            <section class="section">
 
-    updateMapStatus(
-        "MAP // " + type.toUpperCase()
-    );
-}
+                <div class="section-title">
+                    // 02. BSSID LOOKUP
+                </div>
 
 
-/* ========================================================
-   VIEWS BUTTON
-======================================================== */
+                <input
+                    id="bssidInput"
+                    class="input"
+                    type="text"
+                    inputmode="text"
+                    autocomplete="off"
+                    spellcheck="false"
+                    placeholder="AA:BB:CC:DD:EE:FF"
+                >
 
-function toggleViews() {
 
-    const controls =
-        document.querySelectorAll(
-            "#btnGoogle, #btnEsri, #btnDark"
-        );
+                <button
+                    id="bssidButton"
+                    class="action-button green"
+                    type="button"
+                >
+                    LOCATE BSSID
+                </button>
 
-    const hidden =
-        controls[0].style.display === "none";
+            </section>
 
-    controls.forEach(button => {
 
-        button.style.display =
-            hidden ? "" : "none";
 
-    });
+            <!-- INTELLIGENCE -->
 
-    document
-        .getElementById("btnViews")
-        .classList.toggle("active", !hidden);
-}
+            <section class="intelligence">
 
+                <div class="section-title">
+                    // 03. INTELLIGENCE
+                </div>
 
-/* ========================================================
-   MAP MARKERS
-======================================================== */
 
-let currentMarker = null;
-let currentCircle = null;
+                <div
+                    id="terminal"
+                    class="terminal"
+                >
+ARGUSSCOPE // ONLINE
 
+Waiting for target acquisition...
+                </div>
 
-function clearMapResult() {
+            </section>
 
-    if (currentMarker) {
+        </aside>
 
-        map.removeLayer(currentMarker);
-        currentMarker = null;
 
-    }
 
-    if (currentCircle) {
+        <!-- =================================================
+             MAP
+        ================================================== -->
 
-        map.removeLayer(currentCircle);
-        currentCircle = null;
+        <section class="map-container">
 
-    }
+            <div id="map"></div>
 
-}
 
+            <div
+                id="mapStatus"
+                class="map-status"
+            >
+                MAP // READY
+            </div>
 
-function renderMapPosition(
-    lat,
-    lon,
-    radiusMeters,
-    titleInfo
-) {
+        </section>
 
-    if (
-        typeof lat !== "number" ||
-        typeof lon !== "number" ||
-        !Number.isFinite(lat) ||
-        !Number.isFinite(lon)
-    ) {
+    </main>
 
-        return;
 
-    }
 
-    clearMapResult();
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
 
+    <footer class="footer">
+        ARGUSSCOPE // RENDER BACKEND // GITHUB FRONTEND
+    </footer>
 
-    currentMarker = L.marker(
-        [lat, lon]
-    )
-    .addTo(map)
-    .bindPopup(
-        `<b>${escapeHtml(titleInfo)}</b>
-         <br>Lat: ${lat.toFixed(6)}
-         <br>Lon: ${lon.toFixed(6)}`
-    );
 
 
-    if (
-        radiusMeters &&
-        Number.isFinite(Number(radiusMeters)) &&
-        Number(radiusMeters) > 0
-    ) {
+    <!-- =====================================================
+         LEAFLET
+    ====================================================== -->
 
-        currentCircle = L.circle(
-            [lat, lon],
-            {
-                radius: Number(radiusMeters),
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        crossorigin=""
+    ></script>
 
-                color: "#20b8ec",
 
-                fillColor: "#20b8ec",
 
-                fillOpacity: .12,
+    <script>
 
-                weight: 2
-            }
-        ).addTo(map);
+        /* =====================================================
+           CONFIGURATION
+        ===================================================== */
 
-    }
+        const BACKEND_URL =
+            "https://argusscope-backend.onrender.com";
 
 
-    /*
-       IMPORTANT:
-       fitBounds is used instead of repeatedly forcing
-       a fixed zoom level. This prevents the marker/circle
-       from being lost when the user zooms.
-    */
+        /* =====================================================
+           ELEMENTS
+        ===================================================== */
 
-    if (currentCircle) {
+        const ipInput =
+            document.getElementById("ipInput");
 
-        map.fitBounds(
-            currentCircle.getBounds(),
-            {
-                padding: [30, 30],
-                maxZoom: 17
-            }
-        );
+        const bssidInput =
+            document.getElementById("bssidInput");
 
-    } else {
+        const ipButton =
+            document.getElementById("ipButton");
 
-        map.setView(
-            [lat, lon],
-            14,
-            {
-                animate: true
-            }
-        );
+        const bssidButton =
+            document.getElementById("bssidButton");
 
-    }
+        const gpsButton =
+            document.getElementById("gpsButton");
 
+        const mapsButton =
+            document.getElementById("mapsButton");
 
-    updateMapStatus(
-        `MAP // ${lat.toFixed(4)}, ${lon.toFixed(4)}`
-    );
+        const mapMenu =
+            document.getElementById("mapMenu");
 
+        const terminal =
+            document.getElementById("terminal");
 
-    setTimeout(() => {
+        const mapStatus =
+            document.getElementById("mapStatus");
 
-        map.invalidateSize();
 
-    }, 250);
-}
+        /* =====================================================
+           MAP INITIALIZATION
+        ===================================================== */
 
-
-/* ========================================================
-   HTML ESCAPE
-======================================================== */
-
-function escapeHtml(value) {
-
-    return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-}
-
-
-/* ========================================================
-   STATUS
-======================================================== */
-
-function setTelemetry(
-    message,
-    type = "normal"
-) {
-
-    const terminal =
-        document.getElementById(
-            "telemetryOutput"
-        );
-
-    terminal.className =
-        "terminal";
-
-    if (type === "error") {
-        terminal.classList.add("error");
-    }
-
-    if (type === "success") {
-        terminal.classList.add("success");
-    }
-
-    terminal.textContent = message;
-}
-
-
-function updateMapStatus(message) {
-
-    document.getElementById(
-        "mapStatus"
-    ).textContent = message;
-}
-
-
-/* ========================================================
-   SAFE JSON RESPONSE
-======================================================== */
-
-async function readResponse(response) {
-
-    const text =
-        await response.text();
-
-    if (!text) {
-
-        throw new Error(
-            `Server returned an empty response (HTTP ${response.status}).`
-        );
-
-    }
-
-    try {
-
-        return JSON.parse(text);
-
-    } catch {
-
-        throw new Error(
-            `Server returned HTTP ${response.status} with a non-JSON response.`
-        );
-
-    }
-}
-
-
-/* ========================================================
-   BUTTON STATE
-======================================================== */
-
-function setButtonLoading(
-    buttonId,
-    loading
-) {
-
-    const button =
-        document.getElementById(buttonId);
-
-    if (!button) return;
-
-    button.disabled = loading;
-
-    if (loading) {
-
-        button.dataset.originalText =
-            button.textContent;
-
-        button.textContent =
-            "QUERYING...";
-
-    } else {
-
-        button.textContent =
-            button.dataset.originalText ||
-            button.textContent;
-
-    }
-}
-
-
-/* ========================================================
-   IP LOOKUP
-======================================================== */
-
-async function executeIpSearch() {
-
-    const input =
-        document.getElementById(
-            "ipInput"
-        );
-
-    const ip =
-        input.value.trim();
-
-
-    if (!ip) {
-
-        setTelemetry(
-            "Enter an IP address first.",
-            "error"
-        );
-
-        input.focus();
-
-        return;
-    }
-
-
-    setButtonLoading(
-        "ipButton",
-        true
-    );
-
-
-    setTelemetry(
-        `Querying IP telemetry for ${ip}...`
-    );
-
-
-    updateMapStatus(
-        "MAP // QUERYING"
-    );
-
-
-    try {
-
-        const url =
-            `${BACKEND_URL}/api/v1/locate-ip?ip=${encodeURIComponent(ip)}`;
-
-
-        const response =
-            await fetch(
-                url,
+        const map =
+            L.map(
+                "map",
                 {
-                    method: "GET",
-                    headers: {
-                        "Accept":
-                            "application/json"
-                    },
+                    zoomControl: true,
 
-                    cache: "no-store"
+                    attributionControl: true,
+
+                    scrollWheelZoom: true,
+
+                    doubleClickZoom: true,
+
+                    dragging: true,
+
+                    touchZoom: true
                 }
             );
 
 
-        const data =
-            await readResponse(
-                response
+        /*
+           Default position:
+           Agartala / Tripura area.
+        */
+
+        map.setView(
+            [23.8315, 91.2868],
+            6
+        );
+
+
+        /* =====================================================
+           TILE LAYERS
+        ===================================================== */
+
+        /*
+           Google Satellite
+
+           This uses Google's public tile endpoint rather
+           than the Google Maps JavaScript API.
+
+           If Google changes/restricts this endpoint,
+           the ESRI option remains available.
+        */
+
+        const googleLayer =
+            L.tileLayer(
+                "https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+                {
+                    maxZoom: 20,
+
+                    subdomains: [
+                        "mt0",
+                        "mt1",
+                        "mt2",
+                        "mt3"
+                    ],
+
+                    attribution:
+                        "&copy; Google"
+                }
             );
 
 
-        if (
-            data.success &&
-            Number.isFinite(
-                Number(data.latitude)
-            ) &&
-            Number.isFinite(
-                Number(data.longitude)
-            )
-        ) {
+        /*
+           ESRI Satellite
+        */
 
-            setTelemetry(
-                JSON.stringify(
-                    data,
-                    null,
-                    2
-                ),
-                "success"
+        const esriLayer =
+            L.tileLayer(
+                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+                {
+                    maxZoom: 19,
+
+                    attribution:
+                        "Tiles &copy; Esri"
+                }
             );
 
 
-            renderMapPosition(
+        /*
+           Cyber Dark
 
-                Number(data.latitude),
+           IMPORTANT:
 
-                Number(data.longitude),
+           We intentionally use OpenStreetMap here and
+           apply a CSS filter to the tile layer.
 
-                Number(
-                    data.accuracy_radius_m ||
-                    5000
-                ),
+           Therefore this mode does NOT require a
+           separate dark-map API key.
+        */
 
-                `IP Target: ${data.ip || ip}`
+        const darkLayer =
+            L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+                    maxZoom: 19,
 
+                    className:
+                        "cyber-dark-tiles",
+
+                    attribution:
+                        "&copy; OpenStreetMap contributors"
+                }
             );
 
-        } else {
 
-            setTelemetry(
-                data.error ||
-                "IP lookup failed.",
-                "error"
-            );
+        /*
+           Start with ESRI.
+        */
 
-            updateMapStatus(
-                "MAP // NO RESULT"
-            );
+        esriLayer.addTo(map);
 
+
+        let currentLayer =
+            "esri";
+
+
+        /* =====================================================
+           MAP LAYER FUNCTIONS
+        ===================================================== */
+
+        function getLayer(name) {
+
+            if (name === "google") {
+                return googleLayer;
+            }
+
+            if (name === "dark") {
+                return darkLayer;
+            }
+
+            return esriLayer;
         }
 
-    } catch (error) {
 
-        setTelemetry(
-            `IP LOOKUP FAILED\n\n${error.message}`,
-            "error"
-        );
+        function getLayerName(name) {
 
-        updateMapStatus(
-            "MAP // BACKEND ERROR"
-        );
+            if (name === "google") {
+                return "GOOGLE SATELLITE";
+            }
 
-    } finally {
+            if (name === "dark") {
+                return "CYBER DARK";
+            }
 
-        setButtonLoading(
-            "ipButton",
-            false
-        );
-
-    }
-}
+            return "ESRI SATELLITE";
+        }
 
 
-/* ========================================================
-   BSSID LOOKUP
-======================================================== */
+        function changeMap(name) {
 
-async function executeBssidSearch() {
-
-    const input =
-        document.getElementById(
-            "bssidInput"
-        );
+            const newLayer =
+                getLayer(name);
 
 
-    const rawInput =
-        input.value.trim();
+            if (map.hasLayer(
+                googleLayer
+            )) {
+
+                map.removeLayer(
+                    googleLayer
+                );
+            }
 
 
-    if (!rawInput) {
+            if (map.hasLayer(
+                esriLayer
+            )) {
 
-        setTelemetry(
-            "Enter a BSSID first.",
-            "error"
-        );
-
-        input.focus();
-
-        return;
-    }
+                map.removeLayer(
+                    esriLayer
+                );
+            }
 
 
-    /*
-       Multiple BSSIDs may be separated by commas.
-    */
+            if (map.hasLayer(
+                darkLayer
+            )) {
 
-    const macList =
-        rawInput
-            .split(",")
-            .map(
-                mac => mac.trim()
-            )
-            .filter(Boolean);
+                map.removeLayer(
+                    darkLayer
+                );
+            }
 
 
-    setButtonLoading(
-        "bssidButton",
-        true
-    );
+            newLayer.addTo(map);
 
 
-    try {
-
-        let endpoint;
-
-        let options;
+            currentLayer =
+                name;
 
 
-        if (macList.length > 1) {
+            /*
+               Update menu selection.
+            */
 
-            endpoint =
-                `${BACKEND_URL}/api/v1/triangulate-cluster`;
+            document
+                .querySelectorAll(".map-option")
+                .forEach(
+                    button => {
+
+                        button.classList.toggle(
+                            "selected",
+                            button.dataset.map === name
+                        );
+
+                    }
+                );
 
 
-            options = {
+            mapStatus.textContent =
+                "MAP // " +
+                getLayerName(name);
 
-                method: "POST",
 
-                headers: {
-                    "Content-Type":
-                        "application/json",
+            /*
+               Close menu.
+            */
 
-                    "Accept":
-                        "application/json"
+            mapMenu.classList.remove(
+                "open"
+            );
+
+
+            mapsButton.classList.add(
+                "active"
+            );
+
+
+            /*
+               Important after changing tile layers.
+            */
+
+            setTimeout(
+                () => {
+                    map.invalidateSize();
                 },
-
-                body: JSON.stringify({
-
-                    scans:
-                        macList.map(
-                            mac => ({
-                                netid: mac,
-                                rssi: -65
-                            })
-                        )
-
-                })
-
-            };
-
-
-            setTelemetry(
-                `Resolving ${macList.length} BSSID observations...`
+                150
             );
-
-        } else {
-
-            endpoint =
-                `${BACKEND_URL}/api/v1/locate-bssid?netid=${encodeURIComponent(macList[0])}`;
-
-
-            options = {
-
-                method: "GET",
-
-                headers: {
-                    "Accept":
-                        "application/json"
-                },
-
-                cache: "no-store"
-
-            };
-
-
-            setTelemetry(
-                `Querying BSSID telemetry for ${macList[0]}...`
-            );
-
         }
 
 
-        updateMapStatus(
-            "MAP // QUERYING"
+        /* =====================================================
+           MAP MENU
+        ===================================================== */
+
+        mapsButton.addEventListener(
+            "click",
+            event => {
+
+                event.stopPropagation();
+
+                mapMenu.classList.toggle(
+                    "open"
+                );
+
+            }
         );
 
 
-        const response =
-            await fetch(
-                endpoint,
-                options
-            );
+        mapMenu.addEventListener(
+            "click",
+            event => {
+
+                const option =
+                    event.target.closest(
+                        ".map-option"
+                    );
 
 
-        const data =
-            await readResponse(
-                response
-            );
+                if (!option) {
+                    return;
+                }
 
 
-        if (
-            data.success &&
-            Number.isFinite(
-                Number(data.latitude)
-            ) &&
-            Number.isFinite(
-                Number(data.longitude)
-            )
+                changeMap(
+                    option.dataset.map
+                );
+
+            }
+        );
+
+
+        /*
+           Close map menu when tapping elsewhere.
+        */
+
+        document.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    !mapMenu.contains(
+                        event.target
+                    ) &&
+                    event.target !== mapsButton
+                ) {
+
+                    mapMenu.classList.remove(
+                        "open"
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =====================================================
+           MAP RESULT
+        ===================================================== */
+
+        let targetMarker =
+            null;
+
+        let targetCircle =
+            null;
+
+
+        function clearTarget() {
+
+            if (targetMarker) {
+
+                map.removeLayer(
+                    targetMarker
+                );
+
+                targetMarker =
+                    null;
+            }
+
+
+            if (targetCircle) {
+
+                map.removeLayer(
+                    targetCircle
+                );
+
+                targetCircle =
+                    null;
+            }
+        }
+
+
+        function showTarget(
+            latitude,
+            longitude,
+            radius,
+            popupTitle
         ) {
-
-            setTelemetry(
-                JSON.stringify(
-                    data,
-                    null,
-                    2
-                ),
-                "success"
-            );
-
-
-            const label =
-                data.cluster_size
-                    ? `Cluster Target (${data.cluster_size} Nodes)`
-                    : `BSSID: ${data.bssid || macList[0]}`;
-
-
-            renderMapPosition(
-
-                Number(data.latitude),
-
-                Number(data.longitude),
-
-                Number(
-                    data.accuracy_radius_m ||
-                    25
-                ),
-
-                label
-
-            );
-
-        } else {
-
-            setTelemetry(
-                data.error ||
-                "BSSID not found in WiGLE database.",
-                "error"
-            );
-
-            updateMapStatus(
-                "MAP // NO RESULT"
-            );
-
-        }
-
-    } catch (error) {
-
-        setTelemetry(
-            `BSSID LOOKUP FAILED\n\n${error.message}`,
-            "error"
-        );
-
-        updateMapStatus(
-            "MAP // BACKEND ERROR"
-        );
-
-    } finally {
-
-        setButtonLoading(
-            "bssidButton",
-            false
-        );
-
-    }
-}
-
-
-/* ========================================================
-   DEVICE GPS
-======================================================== */
-
-function triggerHardwareGps() {
-
-    const button =
-        document.getElementById(
-            "gpsBtn"
-        );
-
-
-    if (!navigator.geolocation) {
-
-        setTelemetry(
-            "Device GPS is not supported by this browser.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    button.classList.add(
-        "active"
-    );
-
-
-    setTelemetry(
-        "Requesting device GPS permission..."
-    );
-
-
-    updateMapStatus(
-        "MAP // ACQUIRING GPS"
-    );
-
-
-    navigator.geolocation.getCurrentPosition(
-
-        position => {
 
             const lat =
-                position.coords.latitude;
+                Number(latitude);
 
             const lon =
-                position.coords.longitude;
+                Number(longitude);
 
-            const accuracy =
-                position.coords.accuracy;
+            const radiusNumber =
+                Number(radius);
 
 
-            setTelemetry(
+            if (
+                !Number.isFinite(lat) ||
+                !Number.isFinite(lon)
+            ) {
 
-                [
-                    "GPS LOCK ACQUIRED",
+                throw new Error(
+                    "Backend returned invalid coordinates."
+                );
+            }
 
-                    `Latitude : ${lat}`,
 
-                    `Longitude: ${lon}`,
+            clearTarget();
 
-                    `Accuracy : ±${Math.round(accuracy)} m`
 
-                ].join("\n"),
+            targetMarker =
+                L.marker(
+                    [lat, lon]
+                )
+                .addTo(map);
 
-                "success"
 
+            targetMarker.bindPopup(
+                `
+                <strong>
+                    ${escapeHtml(popupTitle)}
+                </strong>
+
+                <br>
+
+                Latitude:
+                ${lat.toFixed(6)}
+
+                <br>
+
+                Longitude:
+                ${lon.toFixed(6)}
+                `
             );
 
 
-            renderMapPosition(
+            /*
+               Draw accuracy radius if supplied.
+            */
 
-                lat,
+            if (
+                Number.isFinite(
+                    radiusNumber
+                ) &&
+                radiusNumber > 0
+            ) {
 
-                lon,
+                targetCircle =
+                    L.circle(
+                        [lat, lon],
+                        {
+                            radius:
+                                radiusNumber,
 
-                accuracy,
+                            color:
+                                "#20b8ec",
 
-                "Device GPS"
+                            fillColor:
+                                "#20b8ec",
 
+                            fillOpacity:
+                                0.10,
+
+                            weight:
+                                1.5
+                        }
+                    )
+                    .addTo(map);
+            }
+
+
+            /*
+               Fit map to result.
+
+               We don't continuously force the map's zoom,
+               so normal user zooming continues to work.
+            */
+
+            if (targetCircle) {
+
+                map.fitBounds(
+                    targetCircle.getBounds(),
+                    {
+                        padding:
+                            [30, 30],
+
+                        maxZoom:
+                            16
+                    }
+                );
+
+            } else {
+
+                map.setView(
+                    [lat, lon],
+                    14
+                );
+            }
+
+
+            mapStatus.textContent =
+                "TARGET // " +
+                lat.toFixed(4) +
+                ", " +
+                lon.toFixed(4);
+
+
+            setTimeout(
+                () => {
+                    map.invalidateSize();
+                },
+                200
+            );
+        }
+
+
+        /* =====================================================
+           HTML ESCAPE
+        ===================================================== */
+
+        function escapeHtml(value) {
+
+            return String(value)
+                .replace(
+                    /&/g,
+                    "&amp;"
+                )
+                .replace(
+                    /</g,
+                    "&lt;"
+                )
+                .replace(
+                    />/g,
+                    "&gt;"
+                )
+                .replace(
+                    /"/g,
+                    "&quot;"
+                )
+                .replace(
+                    /'/g,
+                    "&#039;"
+                );
+        }
+
+
+        /* =====================================================
+           TERMINAL
+        ===================================================== */
+
+        function setTerminal(
+            message,
+            type = "normal"
+        ) {
+
+            terminal.className =
+                "terminal";
+
+
+            if (type === "success") {
+
+                terminal.classList.add(
+                    "success"
+                );
+            }
+
+
+            if (type === "error") {
+
+                terminal.classList.add(
+                    "error"
+                );
+            }
+
+
+            terminal.textContent =
+                message;
+        }
+
+
+        /* =====================================================
+           BUTTON LOADING
+        ===================================================== */
+
+        function setLoading(
+            button,
+            loading,
+            loadingText
+        ) {
+
+            if (loading) {
+
+                if (
+                    !button.dataset.originalText
+                ) {
+
+                    button.dataset.originalText =
+                        button.textContent;
+                }
+
+
+                button.disabled =
+                    true;
+
+                button.textContent =
+                    loadingText;
+
+            } else {
+
+                button.disabled =
+                    false;
+
+                button.textContent =
+                    button.dataset.originalText ||
+                    button.textContent;
+            }
+        }
+
+
+        /* =====================================================
+           RESPONSE PARSER
+        ===================================================== */
+
+        async function parseResponse(
+            response
+        ) {
+
+            const text =
+                await response.text();
+
+
+            if (!text) {
+
+                throw new Error(
+                    "Backend returned an empty response."
+                );
+            }
+
+
+            try {
+
+                return JSON.parse(
+                    text
+                );
+
+            } catch {
+
+                throw new Error(
+                    "Backend returned a non-JSON response. HTTP " +
+                    response.status
+                );
+            }
+        }
+
+
+        /* =====================================================
+           IP LOOKUP
+        ===================================================== */
+
+        async function locateIP() {
+
+            const ip =
+                ipInput.value.trim();
+
+
+            if (!ip) {
+
+                setTerminal(
+                    "ERROR\n\nEnter an IP address.",
+                    "error"
+                );
+
+                ipInput.focus();
+
+                return;
+            }
+
+
+            setLoading(
+                ipButton,
+                true,
+                "QUERYING..."
             );
 
 
-            button.classList.remove(
+            setTerminal(
+                "ARGUSSCOPE // IP LOOKUP\n\n" +
+                "Target: " +
+                ip +
+                "\n\n" +
+                "Contacting intelligence backend..."
+            );
+
+
+            mapStatus.textContent =
+                "MAP // QUERYING";
+
+
+            try {
+
+                const url =
+                    BACKEND_URL +
+                    "/api/v1/locate-ip?ip=" +
+                    encodeURIComponent(ip);
+
+
+                const response =
+                    await fetch(
+                        url,
+                        {
+                            method:
+                                "GET",
+
+                            headers:
+                                {
+                                    "Accept":
+                                        "application/json"
+                                },
+
+                            cache:
+                                "no-store"
+                        }
+                    );
+
+
+                const data =
+                    await parseResponse(
+                        response
+                    );
+
+
+                if (
+                    data.success === true &&
+                    data.latitude !== null &&
+                    data.longitude !== null
+                ) {
+
+                    setTerminal(
+                        JSON.stringify(
+                            data,
+                            null,
+                            2
+                        ),
+                        "success"
+                    );
+
+
+                    showTarget(
+                        data.latitude,
+                        data.longitude,
+                        data.accuracy_radius_m,
+                        "IP: " +
+                        (
+                            data.ip ||
+                            ip
+                        )
+                    );
+
+                } else {
+
+                    setTerminal(
+                        "IP LOOKUP FAILED\n\n" +
+                        (
+                            data.error ||
+                            "No location data returned."
+                        ),
+                        "error"
+                    );
+
+
+                    mapStatus.textContent =
+                        "MAP // NO RESULT";
+                }
+
+            } catch (error) {
+
+                setTerminal(
+                    "IP LOOKUP ERROR\n\n" +
+                    error.message,
+                    "error"
+                );
+
+
+                mapStatus.textContent =
+                    "MAP // BACKEND ERROR";
+
+            } finally {
+
+                setLoading(
+                    ipButton,
+                    false
+                );
+            }
+        }
+
+
+        /* =====================================================
+           BSSID VALIDATION
+        ===================================================== */
+
+        function normalizeBssid(
+            value
+        ) {
+
+            return value
+                .trim()
+                .toLowerCase()
+                .replace(
+                    /-/g,
+                    ":"
+                );
+        }
+
+
+        function isValidBssid(
+            value
+        ) {
+
+            const clean =
+                value
+                    .replace(
+                        /:/g,
+                        ""
+                    )
+                    .trim();
+
+
+            return (
+                /^[0-9a-fA-F]{12}$/
+                .test(clean)
+            );
+        }
+
+
+        /* =====================================================
+           BSSID LOOKUP
+        ===================================================== */
+
+        async function locateBssid() {
+
+            const raw =
+                bssidInput.value.trim();
+
+
+            if (!raw) {
+
+                setTerminal(
+                    "ERROR\n\nEnter a BSSID.",
+                    "error"
+                );
+
+                bssidInput.focus();
+
+                return;
+            }
+
+
+            /*
+               Allow:
+
+               AA:BB:CC:DD:EE:FF
+
+               or multiple:
+
+               AA:BB:CC:DD:EE:FF,
+               11:22:33:44:55:66
+            */
+
+            const bssids =
+                raw
+                    .split(",")
+                    .map(
+                        normalizeBssid
+                    )
+                    .filter(Boolean);
+
+
+            for (
+                const bssid
+                of bssids
+            ) {
+
+                if (
+                    !isValidBssid(
+                        bssid
+                    )
+                ) {
+
+                    setTerminal(
+                        "INVALID BSSID\n\n" +
+                        bssid +
+                        "\n\n" +
+                        "Expected format:\n" +
+                        "AA:BB:CC:DD:EE:FF",
+                        "error"
+                    );
+
+                    return;
+                }
+            }
+
+
+            setLoading(
+                bssidButton,
+                true,
+                "QUERYING..."
+            );
+
+
+            mapStatus.textContent =
+                "MAP // QUERYING";
+
+
+            try {
+
+                /*
+                   SINGLE BSSID
+                */
+
+                if (
+                    bssids.length === 1
+                ) {
+
+                    setTerminal(
+                        "ARGUSSCOPE // BSSID LOOKUP\n\n" +
+                        "Target: " +
+                        bssids[0] +
+                        "\n\n" +
+                        "Querying WiGLE..."
+                    );
+
+
+                    const url =
+                        BACKEND_URL +
+                        "/api/v1/locate-bssid?netid=" +
+                        encodeURIComponent(
+                            bssids[0]
+                        );
+
+
+                    const response =
+                        await fetch(
+                            url,
+                            {
+                                method:
+                                    "GET",
+
+                                headers:
+                                    {
+                                        "Accept":
+                                            "application/json"
+                                    },
+
+                                cache:
+                                    "no-store"
+                            }
+                        );
+
+
+                    const data =
+                        await parseResponse(
+                            response
+                        );
+
+
+                    if (
+                        data.success === true &&
+                        data.latitude !== null &&
+                        data.longitude !== null
+                    ) {
+
+                        setTerminal(
+                            JSON.stringify(
+                                data,
+                                null,
+                                2
+                            ),
+                            "success"
+                        );
+
+
+                        showTarget(
+                            data.latitude,
+                            data.longitude,
+                            data.accuracy_radius_m,
+                            "BSSID: " +
+                            (
+                                data.bssid ||
+                                bssids[0]
+                            )
+                        );
+
+                    } else {
+
+                        setTerminal(
+                            "BSSID LOOKUP FAILED\n\n" +
+                            (
+                                data.error ||
+                                "BSSID was not found."
+                            ),
+                            "error"
+                        );
+
+
+                        mapStatus.textContent =
+                            "MAP // NO RESULT";
+                    }
+
+
+                    return;
+                }
+
+
+                /*
+                   MULTI-BSSID CLUSTER
+                */
+
+                setTerminal(
+                    "ARGUSSCOPE // CLUSTER FUSION\n\n" +
+                    "Targets: " +
+                    bssids.length +
+                    "\n\n" +
+                    "Querying WiGLE cluster..."
+                );
+
+
+                const scans =
+                    bssids.map(
+                        bssid => {
+
+                            return {
+                                netid:
+                                    bssid,
+
+                                rssi:
+                                    -65
+                            };
+
+                        }
+                    );
+
+
+                const response =
+                    await fetch(
+                        BACKEND_URL +
+                        "/api/v1/triangulate-cluster",
+                        {
+                            method:
+                                "POST",
+
+                            headers:
+                                {
+                                    "Content-Type":
+                                        "application/json",
+
+                                    "Accept":
+                                        "application/json"
+                                },
+
+                            body:
+                                JSON.stringify(
+                                    {
+                                        scans:
+                                            scans
+                                    }
+                                )
+                        }
+                    );
+
+
+                const data =
+                    await parseResponse(
+                        response
+                    );
+
+
+                if (
+                    data.success === true &&
+                    data.latitude !== null &&
+                    data.longitude !== null
+                ) {
+
+                    setTerminal(
+                        JSON.stringify(
+                            data,
+                            null,
+                            2
+                        ),
+                        "success"
+                    );
+
+
+                    showTarget(
+                        data.latitude,
+                        data.longitude,
+                        data.accuracy_radius_m,
+                        "BSSID Cluster"
+                    );
+
+                } else {
+
+                    setTerminal(
+                        "CLUSTER LOOKUP FAILED\n\n" +
+                        (
+                            data.error ||
+                            "No valid cluster coordinates returned."
+                        ),
+                        "error"
+                    );
+
+
+                    mapStatus.textContent =
+                        "MAP // NO RESULT";
+                }
+
+            } catch (error) {
+
+                setTerminal(
+                    "BSSID LOOKUP ERROR\n\n" +
+                    error.message,
+                    "error"
+                );
+
+
+                mapStatus.textContent =
+                    "MAP // BACKEND ERROR";
+
+            } finally {
+
+                setLoading(
+                    bssidButton,
+                    false
+                );
+            }
+        }
+
+
+        /* =====================================================
+           DEVICE GPS
+        ===================================================== */
+
+        function locateDevice() {
+
+            if (
+                !navigator.geolocation
+            ) {
+
+                setTerminal(
+                    "GPS ERROR\n\n" +
+                    "This browser does not support device location.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            gpsButton.classList.add(
                 "active"
             );
 
-        },
 
-
-        error => {
-
-            let message =
-                "GPS acquisition failed.";
-
-            if (error.code === 1) {
-
-                message =
-                    "GPS permission was denied.";
-
-            } else if (error.code === 2) {
-
-                message =
-                    "Device location is unavailable.";
-
-            } else if (error.code === 3) {
-
-                message =
-                    "GPS request timed out.";
-
-            }
-
-
-            setTelemetry(
-                message,
-                "error"
+            setTerminal(
+                "ARGUSSCOPE // DEVICE GPS\n\n" +
+                "Requesting location permission..."
             );
 
 
-            updateMapStatus(
-                "MAP // GPS FAILED"
+            mapStatus.textContent =
+                "MAP // ACQUIRING GPS";
+
+
+            navigator.geolocation.getCurrentPosition(
+
+                position => {
+
+                    const latitude =
+                        position.coords.latitude;
+
+                    const longitude =
+                        position.coords.longitude;
+
+                    const accuracy =
+                        position.coords.accuracy;
+
+
+                    setTerminal(
+
+                        [
+                            "DEVICE GPS // LOCK ACQUIRED",
+
+                            "",
+
+                            "Latitude : " +
+                            latitude,
+
+                            "Longitude: " +
+                            longitude,
+
+                            "Accuracy : ±" +
+                            Math.round(
+                                accuracy
+                            ) +
+                            " m"
+
+                        ].join("\n"),
+
+                        "success"
+                    );
+
+
+                    showTarget(
+                        latitude,
+                        longitude,
+                        accuracy,
+                        "DEVICE GPS"
+                    );
+
+
+                    gpsButton.classList.remove(
+                        "active"
+                    );
+                },
+
+
+                error => {
+
+                    let message;
+
+
+                    if (
+                        error.code ===
+                        error.PERMISSION_DENIED
+                    ) {
+
+                        message =
+                            "Location permission was denied.";
+
+                    } else if (
+                        error.code ===
+                        error.POSITION_UNAVAILABLE
+                    ) {
+
+                        message =
+                            "Device location is unavailable.";
+
+                    } else if (
+                        error.code ===
+                        error.TIMEOUT
+                    ) {
+
+                        message =
+                            "Location request timed out.";
+
+                    } else {
+
+                        message =
+                            "Unable to obtain device location.";
+                    }
+
+
+                    setTerminal(
+                        "GPS ERROR\n\n" +
+                        message,
+                        "error"
+                    );
+
+
+                    mapStatus.textContent =
+                        "MAP // GPS FAILED";
+
+
+                    gpsButton.classList.remove(
+                        "active"
+                    );
+                },
+
+
+                {
+                    enableHighAccuracy:
+                        true,
+
+                    timeout:
+                        15000,
+
+                    maximumAge:
+                        0
+                }
             );
-
-
-            button.classList.remove(
-                "active"
-            );
-
-        },
-
-        {
-
-            enableHighAccuracy: true,
-
-            timeout: 15000,
-
-            maximumAge: 0
-
         }
 
-    );
-}
 
+        /* =====================================================
+           BUTTON EVENTS
+        ===================================================== */
 
-/* ========================================================
-   ENTER KEY SUPPORT
-======================================================== */
-
-document
-    .getElementById("ipInput")
-    .addEventListener(
-        "keydown",
-        event => {
-
-            if (
-                event.key === "Enter"
-            ) {
-
-                executeIpSearch();
-
-            }
-
-        }
-    );
-
-
-document
-    .getElementById("bssidInput")
-    .addEventListener(
-        "keydown",
-        event => {
-
-            if (
-                event.key === "Enter"
-            ) {
-
-                executeBssidSearch();
-
-            }
-
-        }
-    );
-
-
-/* ========================================================
-   MOBILE MAP FIX
-======================================================== */
-
-window.addEventListener(
-    "resize",
-    () => {
-
-        setTimeout(
-            () => map.invalidateSize(),
-            150
+        ipButton.addEventListener(
+            "click",
+            locateIP
         );
 
-    }
-);
 
-
-window.addEventListener(
-    "orientationchange",
-    () => {
-
-        setTimeout(
-            () => map.invalidateSize(),
-            400
+        bssidButton.addEventListener(
+            "click",
+            locateBssid
         );
 
-    }
-);
+
+        gpsButton.addEventListener(
+            "click",
+            locateDevice
+        );
 
 
-/* ========================================================
-   INITIALIZATION
-======================================================== */
+        /* =====================================================
+           ENTER KEY
+        ===================================================== */
 
-setTimeout(
-    () => map.invalidateSize(),
-    300
-);
+        ipInput.addEventListener(
+            "keydown",
+            event => {
 
-</script>
+                if (
+                    event.key === "Enter"
+                ) {
+
+                    event.preventDefault();
+
+                    locateIP();
+                }
+            }
+        );
+
+
+        bssidInput.addEventListener(
+            "keydown",
+            event => {
+
+                if (
+                    event.key === "Enter"
+                ) {
+
+                    event.preventDefault();
+
+                    locateBssid();
+                }
+            }
+        );
+
+
+        /* =====================================================
+           MAP RESIZE
+        ===================================================== */
+
+        window.addEventListener(
+            "resize",
+            () => {
+
+                setTimeout(
+                    () => {
+                        map.invalidateSize();
+                    },
+                    100
+                );
+            }
+        );
+
+
+        window.addEventListener(
+            "orientationchange",
+            () => {
+
+                setTimeout(
+                    () => {
+                        map.invalidateSize();
+                    },
+                    350
+                );
+            }
+        );
+
+
+        /* =====================================================
+           INITIALIZE
+        ===================================================== */
+
+        setTimeout(
+            () => {
+
+                map.invalidateSize();
+
+            },
+            300
+        );
+
+    </script>
 
 </body>
 </html>
