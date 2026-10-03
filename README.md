@@ -887,19 +887,6 @@ Current backend version:
 
 ---
 
-# License
-
-Choose and add a license appropriate for the project before publishing the repository.
-
-For example:
-
-```text
-MIT License
-```
-
-Third-party services, map data, imagery, and APIs remain subject to their respective licenses and terms.
-
----
 
 # Disclaimer
 
