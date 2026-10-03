@@ -167,19 +167,6 @@
       letter-spacing: 1.5px;
     }
 
-    .drop-zone {
-      background: var(--bg-card);
-      border: 1px dashed var(--border-color);
-      border-radius: 6px;
-      padding: 20px;
-      text-align: center;
-      cursor: pointer;
-    }
-
-    .drop-zone-text { font-size: 0.85rem; color: var(--text-muted); }
-    .drop-zone-text b { color: var(--text-main); }
-    input[type="file"] { display: none; }
-
     .input-group { display: flex; gap: 8px; }
 
     input[type="text"] {
@@ -281,21 +268,15 @@
 
     <div class="sidebar">
 
-      <div class="section-title">// 01. Image EXIF Extraction</div>
-      <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
-        <p class="drop-zone-text" id="fileLabel">Drop image or <b>Click to Select</b></p>
-        <input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload(this.files[0])">
-      </div>
-
-      <div class="section-title">// 02. Network Locator</div>
+      <div class="section-title">// 01. Network Locator</div>
       <div class="input-group">
-        <input type="text" id="ipInput" placeholder="Enter target IP (e.g. 8.8.8.8)">
+        <input type="text" id="ipInput" placeholder="Enter IP or Domain (e.g. google.com)">
         <button class="btn-action" onclick="lookupIP()">QUERY</button>
       </div>
 
-      <div class="section-title">// 03. Intelligence Report</div>
+      <div class="section-title">// 02. Intelligence Report</div>
       <div class="intel-terminal" id="intelTerminal">
-        System initialized. Select an image, query an IP address, or click MY GPS to locate your device.
+        System initialized. Enter an IP or domain name, or click MY GPS to locate your device.
       </div>
 
     </div>
@@ -355,16 +336,13 @@
     checkBackendStatus();
 
     function plotCoordinates(lat, lng, label) {
-      // Force remove existing marker from map layer
       if (activeMarker) {
         map.removeLayer(activeMarker);
         activeMarker = null;
       }
 
-      // Fly map smoothly to new coordinates
       map.flyTo([lat, lng], 12, { duration: 1.2 });
       
-      // Create new marker instance
       activeMarker = L.marker([lat, lng]).addTo(map)
         .bindPopup(`<b>${label}</b><br>LAT: ${lat.toFixed(5)}<br>LNG: ${lng.toFixed(5)}`)
         .openPopup();
@@ -398,35 +376,6 @@
       );
     }
 
-    async function handleFileUpload(file) {
-      if (!file) return;
-      document.getElementById('fileLabel').innerText = file.name;
-      const log = document.getElementById('intelTerminal');
-      log.innerHTML = `Parsing EXIF metadata for: <br><span style="color:var(--accent-cyan);">${file.name}</span>...`;
-
-      const formData = new FormData();
-      formData.append("file", file);
-
-      try {
-        const res = await fetch(`${API_URL}/api/v1/extract-exif`, { method: "POST", body: formData });
-        const data = await res.json();
-
-        if (data.latitude && data.longitude) {
-          plotCoordinates(data.latitude, data.longitude, file.name);
-          log.innerHTML = `
-            <div class="intel-row"><span class="intel-key">FILE</span><span class="intel-val">${data.filename}</span></div>
-            <div class="intel-row"><span class="intel-key">LATITUDE</span><span class="intel-val">${data.latitude.toFixed(5)}</span></div>
-            <div class="intel-row"><span class="intel-key">LONGITUDE</span><span class="intel-val">${data.longitude.toFixed(5)}</span></div>
-            <div class="intel-row"><span class="intel-key">STATUS</span><span class="intel-val" style="color:var(--accent-green)">COORDINATES RESOLVED</span></div>
-          `;
-        } else {
-          log.innerHTML = `<span style="color:var(--accent-red)">NO GPS METADATA FOUND IN IMAGE.</span>`;
-        }
-      } catch (err) {
-        log.innerHTML = `<span style="color:var(--accent-red)">ERROR CONNECTING TO BACKEND API.</span>`;
-      }
-    }
-
     async function lookupIP() {
       const ipInput = document.getElementById('ipInput');
       const ip = ipInput.value.trim();
@@ -436,7 +385,6 @@
       log.innerHTML = `Querying target: <br><span style="color:var(--accent-cyan);">${ip}</span>...`;
 
       try {
-        // Appended timestamp parameter (?_t=...) to prevent browser from returning cached API responses
         const res = await fetch(`${API_URL}/api/v1/locate-ip?ip=${encodeURIComponent(ip)}&_t=${Date.now()}`);
         const data = await res.json();
 
