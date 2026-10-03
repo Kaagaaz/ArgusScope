@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ARGUSSCOPE // Advanced Network Recon</title>
+  <title>ARGUSSCOPE // Advanced Recon Engine</title>
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -50,7 +50,6 @@
     }
 
     .brand { display: flex; align-items: center; gap: 12px; }
-
     .brand-logo {
       width: 12px; height: 12px;
       background: var(--accent-cyan);
@@ -65,7 +64,6 @@
       font-weight: 700;
       color: #fff;
     }
-
     header h1 span { color: var(--accent-cyan); }
 
     .header-actions { display: flex; align-items: center; gap: 16px; }
@@ -89,6 +87,7 @@
       padding: 6px 12px;
       border-radius: 4px;
       cursor: pointer;
+      transition: all 0.2s ease;
     }
 
     .map-btn.active {
@@ -107,27 +106,6 @@
       padding: 6px 12px;
       border-radius: 4px;
       cursor: pointer;
-    }
-
-    .system-status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
-
-    .status-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #eab308;
-    }
-
-    .status-dot.online {
-      background: var(--accent-green);
-      box-shadow: 0 0 8px var(--accent-green);
     }
 
     .dashboard {
@@ -200,10 +178,9 @@
       border-bottom: 1px dashed var(--border-color);
       padding: 6px 0;
     }
-
     .intel-row:last-child { border-bottom: none; }
     .intel-key { color: var(--text-muted); }
-    .intel-val { color: var(--accent-cyan); font-weight: 500; text-align: right; word-break: break-all; }
+    .intel-val { color: var(--accent-cyan); font-weight: 500; text-align: right; }
 
     .map-container {
       position: relative;
@@ -215,9 +192,11 @@
 
     #map { width: 100%; height: 100%; background: #000; }
 
+    /* Map mode CSS filters */
     .mode-dark .leaflet-tile { filter: brightness(0.7) invert(1) contrast(1.2) hue-rotate(200deg) saturate(0.3); }
-    .mode-satellite .leaflet-tile { filter: none !important; }
-    .mode-topo .leaflet-tile { filter: contrast(1.1) brightness(0.9); }
+    .mode-satellite .leaflet-tile { filter: brightness(1.05) contrast(1.1); }
+    .mode-sentinel .leaflet-tile { filter: brightness(1.1) contrast(1.15) saturate(1.1); }
+    .mode-topo .leaflet-tile { filter: contrast(1.1) brightness(0.95); }
 
     .leaflet-container { background: #060913 !important; }
     .leaflet-popup-content-wrapper {
@@ -229,51 +208,43 @@
     }
   </style>
 </head>
-<body class="mode-dark">
+<body class="mode-satellite">
 
   <header>
     <div class="brand">
       <div class="brand-logo"></div>
-      <h1>ARGUS<span>SCOPE</span> // CONSENSUS ENGINE</h1>
+      <h1>ARGUS<span>SCOPE</span> // GEOSPATIAL ENGINE</h1>
     </div>
 
     <div class="header-actions">
-      <button class="btn-gps" onclick="locateDeviceGPS()">📍 MY GPS</button>
+      <button class="btn-gps" onclick="locateDeviceGPS()">📍 HARDWARE GPS</button>
 
       <div class="map-switcher">
-        <button class="map-btn active" id="btnDark" onclick="switchMapMode('dark')">CYBER DARK</button>
-        <button class="map-btn" id="btnSat" onclick="switchMapMode('satellite')">SATELLITE</button>
-        <button class="map-btn" id="btnTopo" onclick="switchMapMode('topo')">3D TOPO</button>
-      </div>
-
-      <div class="system-status">
-        <div class="status-dot" id="statusDot"></div>
-        <span id="statusText">CONNECTING...</span>
+        <button class="map-btn active" id="btnSat" onclick="switchMapMode('satellite')">ESRI HD</button>
+        <button class="map-btn" id="btnSentinel" onclick="switchMapMode('sentinel')">SENTINEL-2</button>
+        <button class="map-btn" id="btnDark" onclick="switchMapMode('dark')">CYBER DARK</button>
+        <button class="map-btn" id="btnTopo" onclick="switchMapMode('topo')">TOPO RELIEF</button>
       </div>
     </div>
   </header>
 
   <div class="dashboard">
-
     <div class="sidebar">
-
-      <div class="section-title">// 01. Network Target Intelligence</div>
+      <div class="section-title">// 01. Target Coordinates / IP</div>
       <div class="input-group">
-        <input type="text" id="ipInput" placeholder="Enter IP or Domain (e.g. 8.8.8.8)">
-        <button class="btn-action" onclick="lookupIP()">QUERY</button>
+        <input type="text" id="ipInput" placeholder="Enter IP or Domain (e.g., 184.84.167.84)">
+        <button class="btn-action" onclick="lookupIP()">EXECUTE</button>
       </div>
 
-      <div class="section-title">// 02. Multi-Source Telemetry</div>
+      <div class="section-title">// 02. Geospatial Telemetry</div>
       <div class="intel-terminal" id="intelTerminal">
-        Consensus Engine active. Enter an IP or domain to execute multi-database triangulation.
+        High-Resolution GIS Tile Engine active. Enter an IP or Domain to execute analysis.
       </div>
-
     </div>
 
     <div class="map-container">
       <div id="map"></div>
     </div>
-
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -281,16 +252,35 @@
   <script>
     const API_URL = "https://argusscope-backend.onrender.com";
 
+    // High-Resolution GIS Tile Layer Configuration
     const layers = {
-      dark: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }),
-      satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18 }),
-      topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17 })
+      // 1. ESRI World Imagery (High-Res Commercial Satellite)
+      satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19,
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+      }),
+      // 2. EOX Sentinel-2 Cloudless (Earth Observation Satellite Data)
+      sentinel: L.tileLayer('https://e.tiles.maps.eox.at/wmts/1.0.0/s2cloudless_3857/default/GoogleMapsCompatible/{z}/{y}/{x}.jpg', {
+        maxZoom: 13,
+        attribution: 'Sentinel-2 cloudless &copy; EOX IT Services GmbH (Contains modified Copernicus Sentinel data)'
+      }),
+      // 3. OpenStreetMap Inverted Dark
+      dark: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+      }),
+      // 4. OpenTopoMap (Topographic Relief Curves)
+      topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+        maxZoom: 17,
+        attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap (CC-BY-SA)'
+      })
     };
 
-    const map = L.map('map', { zoomControl: false, layers: [layers.dark] }).setView([20, 0], 2);
+    // Initialize map on Esri Satellite HD by default
+    const map = L.map('map', { zoomControl: false, layers: [layers.satellite] }).setView([20, 0], 3);
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    let activeLayerKey = 'dark';
+    let activeLayerKey = 'satellite';
     let activeMarker = null;
     let activeRadiusCircle = null;
 
@@ -302,36 +292,18 @@
       document.body.className = `mode-${key}`;
 
       document.querySelectorAll('.map-btn').forEach(btn => btn.classList.remove('active'));
-      if (key === 'dark') document.getElementById('btnDark').classList.add('active');
       if (key === 'satellite') document.getElementById('btnSat').classList.add('active');
+      if (key === 'sentinel') document.getElementById('btnSentinel').classList.add('active');
+      if (key === 'dark') document.getElementById('btnDark').classList.add('active');
       if (key === 'topo') document.getElementById('btnTopo').classList.add('active');
     }
-
-    async function checkBackendStatus() {
-      const dot = document.getElementById('statusDot');
-      const text = document.getElementById('statusText');
-      try {
-        const res = await fetch(`${API_URL}/`);
-        if (res.ok) {
-          dot.classList.add('online');
-          text.innerText = "ENGINE ONLINE";
-        } else {
-          text.innerText = "API ERROR";
-        }
-      } catch (e) {
-        text.innerText = "WAKING ENGINE...";
-        setTimeout(checkBackendStatus, 5000);
-      }
-    }
-    checkBackendStatus();
 
     function plotCoordinates(lat, lng, label, radiusMeters = 0) {
       if (activeMarker) map.removeLayer(activeMarker);
       if (activeRadiusCircle) map.removeLayer(activeRadiusCircle);
 
-      map.flyTo([lat, lng], 11, { duration: 1.2 });
+      map.flyTo([lat, lng], 13, { duration: 1.5 });
 
-      // Draw dynamic uncertainty radius circle
       if (radiusMeters > 0) {
         activeRadiusCircle = L.circle([lat, lng], {
           color: '#38bdf8',
@@ -342,24 +314,24 @@
       }
 
       activeMarker = L.marker([lat, lng]).addTo(map)
-        .bindPopup(`<b>${label}</b><br>LAT: ${lat.toFixed(5)}<br>LNG: ${lng.toFixed(5)}<br>Uncertainty: ~${Math.round(radiusMeters/1000)} km`)
+        .bindPopup(`<b>${label}</b><br>LAT: ${lat.toFixed(5)}<br>LNG: ${lng.toFixed(5)}`)
         .openPopup();
     }
 
     function locateDeviceGPS() {
       const log = document.getElementById('intelTerminal');
-      log.innerHTML = `Requesting device hardware location...`;
+      log.innerHTML = `Acquiring Hardware Geolocation...`;
 
       if (!navigator.geolocation) {
-        log.innerHTML = `<span style="color:var(--accent-red)">GEOLOCATION NOT SUPPORTED.</span>`;
+        log.innerHTML = `<span style="color:var(--accent-red)">GEOLOCATION UNSUPPORTED.</span>`;
         return;
       }
 
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          const acc = position.coords.accuracy;
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const acc = pos.coords.accuracy;
           plotCoordinates(lat, lng, "Device GPS Position", acc);
           log.innerHTML = `
             <div class="intel-row"><span class="intel-key">SOURCE</span><span class="intel-val" style="color:var(--accent-green)">HARDWARE GPS</span></div>
@@ -368,43 +340,37 @@
             <div class="intel-row"><span class="intel-key">ACCURACY</span><span class="intel-val">~${Math.round(acc)} meters</span></div>
           `;
         },
-        (error) => {
-          log.innerHTML = `<span style="color:var(--accent-red)">LOCATION ACCESS DENIED.</span>`;
+        (err) => {
+          log.innerHTML = `<span style="color:var(--accent-red)">LOCATION PERMISSION DENIED.</span>`;
         },
         { enableHighAccuracy: true }
       );
     }
 
     async function lookupIP() {
-      const ipInput = document.getElementById('ipInput');
-      const ip = ipInput.value.trim();
+      const ip = document.getElementById('ipInput').value.trim();
       if (!ip) return;
 
       const log = document.getElementById('intelTerminal');
-      log.innerHTML = `Executing consensus triangulation on: <br><span style="color:var(--accent-cyan);">${ip}</span>...`;
+      log.innerHTML = `Querying GIS Coordinates for target: <br><span style="color:var(--accent-cyan);">${ip}</span>...`;
 
       try {
         const res = await fetch(`${API_URL}/api/v1/locate-ip?ip=${encodeURIComponent(ip)}&_t=${Date.now()}`);
         const data = await res.json();
 
         if (data.latitude && data.longitude) {
-          plotCoordinates(data.latitude, data.longitude, `Target: ${data.ip}`, data.accuracy_radius_m);
+          plotCoordinates(data.latitude, data.longitude, `Target: ${data.ip}`, data.accuracy_radius_m || 8000);
           log.innerHTML = `
-            <div class="intel-row"><span class="intel-key">TARGET IP</span><span class="intel-val">${data.ip}</span></div>
-            <div class="intel-row"><span class="intel-key">CONFIDENCE</span><span class="intel-val" style="color:var(--accent-green)">${data.confidence}</span></div>
-            <div class="intel-row"><span class="intel-key">CITY / COUNTRY</span><span class="intel-val">${data.city}, ${data.country}</span></div>
-            <div class="intel-row"><span class="intel-key">rDNS HOSTNAME</span><span class="intel-val">${data.hostname}</span></div>
-            <div class="intel-row"><span class="intel-key">rDNS CITY HINT</span><span class="intel-val">${data.rdns_city_hint}</span></div>
-            <div class="intel-row"><span class="intel-key">ISP / NETWORK</span><span class="intel-val">${data.org}</span></div>
-            <div class="intel-row"><span class="intel-key">CONSENSUS COORDS</span><span class="intel-val">${data.latitude}, ${data.longitude}</span></div>
-            <div class="intel-row"><span class="intel-key">RADIUS / UNCERTAINTY</span><span class="intel-val">~${Math.round(data.accuracy_radius_m/1000)} km</span></div>
-            <div class="intel-row"><span class="intel-key">APIS QUERIED</span><span class="intel-val">${data.sources_queried} Providers</span></div>
+            <div class="intel-row"><span class="intel-key">TARGET</span><span class="intel-val">${data.ip}</span></div>
+            <div class="intel-row"><span class="intel-key">CITY / REGION</span><span class="intel-val">${data.city || 'Unknown'}, ${data.country || 'Unknown'}</span></div>
+            <div class="intel-row"><span class="intel-key">COORDINATES</span><span class="intel-val">${data.latitude}, ${data.longitude}</span></div>
+            <div class="intel-row"><span class="intel-key">NETWORK / ISP</span><span class="intel-val">${data.org || 'Unknown'}</span></div>
           `;
         } else {
-          log.innerHTML = `<span style="color:var(--accent-red)">UNABLE TO RESOLVE SPECIFIED TARGET.</span>`;
+          log.innerHTML = `<span style="color:var(--accent-red)">UNABLE TO RESOLVE TARGET.</span>`;
         }
       } catch (err) {
-        log.innerHTML = `<span style="color:var(--accent-red)">ERROR CONNECTING TO BACKEND API.</span>`;
+        log.innerHTML = `<span style="color:var(--accent-red)">API CONNECTION ERROR.</span>`;
       }
     }
   </script>
