@@ -688,6 +688,7 @@ Device GPS is particularly sensitive because it represents the physical location
 Current limitations include:
 
 - IP geolocation is approximate.
+- Reports may not be accurate.
 - WiGLE coverage is not universal.
 - WiGLE observations can become outdated.
 - External providers can experience downtime.
